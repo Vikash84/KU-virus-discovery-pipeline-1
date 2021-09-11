@@ -20,6 +20,6 @@ all_taxons <- as.data.frame(getTaxonomy(uniq_taxid, args[2]))
 all_taxons <- tibble::rownames_to_column(all_taxons, "TAXID")
 all_taxons$TAXID <- as.integer(all_taxons$TAXID)
 
-taxon_mapped_data <- inner_join(data, all_taxon, by = "TAXID")
+taxon_mapped_data <- inner_join(data, all_taxons, by = "TAXID")
 
 write.table(taxon_mapped_data, file = args[1], row.names=FALSE, col.names = TRUE, sep="\t", quote = FALSE)
