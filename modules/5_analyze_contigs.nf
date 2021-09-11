@@ -48,7 +48,7 @@ process diamondBlastx {
     output:
         path "${params.prefix}.blastx.tmp"
     """
-    diamond blastx -d $params.diamond_db_path -q $contigs --max-target-seqs 1 --evalue 1.0e-5 --outfmt 6 qseqid sseqid stitle pident qlen length mismatch gapopen qstart qend sstart send evalue bitscore > ${params.prefix}.blastx.tmp
+    diamond blastx -d $params.diamond_db_path -q $contigs --max-target-seqs 1 --evalue 1.0e-5 --outfmt 6 qseqid sseqid staxids stitle pident qlen length mismatch gapopen qstart qend sstart send evalue bitscore > ${params.prefix}.blastx.tmp
     """
 }
 
@@ -89,7 +89,7 @@ process makeTxtFromBlastAln_1 {
     output:
         path "${aln.baseName}.tmp"
     """
-    blast_formatter -archive $aln -outfmt "6 qseqid sseqid stitle pident qlen length mismatch gapopen qstart qend sstart send evalue bitscore"  > "${aln.baseName}.tmp"
+    blast_formatter -archive $aln -outfmt "6 qseqid sseqid staxids stitle pident qlen length mismatch gapopen qstart qend sstart send evalue bitscore"  > "${aln.baseName}.tmp"
     """
 }
 
@@ -102,7 +102,7 @@ process makeTxtFromBlastAln_2 {
     output:
         path "${aln.baseName}.tmp"
     """
-    blast_formatter -archive $aln -outfmt "6 qseqid sseqid stitle pident qlen length mismatch gapopen qstart qend sstart send evalue bitscore"  > "${aln.baseName}.tmp"
+    blast_formatter -archive $aln -outfmt "6 qseqid sseqid staxids stitle pident qlen length mismatch gapopen qstart qend sstart send evalue bitscore"  > "${aln.baseName}.tmp"
     """
 }
 
