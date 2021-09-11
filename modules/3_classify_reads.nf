@@ -31,10 +31,12 @@ process kreport2heatmap {
     input:
         path kraken_report
     output:
-        path path "${params.prefix}.heatmap.png"
+        path "${params.prefix}_phylum.svg"
+        path "${params.prefix}_family.svg"
+        path "${params.prefix}_species.svg"
     """
-    perl ${params.pipeline_directory}/convert_krakenRep2list.pl < $kraken_report > ${params.prefix}.list
-    Rscript ${params.pipeline_directory}/make_heatmap_with_metacomp.R ${params.prefix}.list
+    perl ${params.pipeline_directory}/script/convert_krakenRep2list.pl < $kraken_report > ${params.prefix}.list
+    Rscript ${params.pipeline_directory}/script/make_heatmap_with_metacomp.R ${params.prefix}.list ${params.prefix}
     """
 }
 
