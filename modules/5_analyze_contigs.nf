@@ -222,7 +222,7 @@ process matchTaxonomyToBlastResult_blastx {
         path "${txt.simpleName}.blastx.txt"
 
     """
-    Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.blastx.txt
+    Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${params.taxonomizr_db_path}
     """
 }
 
