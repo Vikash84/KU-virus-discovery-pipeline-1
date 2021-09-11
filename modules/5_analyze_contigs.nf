@@ -11,16 +11,19 @@ workflow analyze_contigs {
         makeHtmlFromBlastAln_1(blastn_aln)
         blastn_tmp = makeTxtFromBlastAln_1(blastn_aln)
         blastn_txt = add_header_1(blastn_tmp)
-        filterBlastResult_1(blastn_txt)
+        blastn_filtered = filterBlastResult_blastn(blastn_txt)
+        matchTaxonomyToBlastResult_blastn(blastn_filtered)
 
         makeHtmlFromBlastAln_2(megablast_aln)
         megablast_tmp = makeTxtFromBlastAln_2(megablast_aln)
         megablast_txt = add_header_2(megablast_tmp)
-        filterBlastResult_2(megablast_txt)
+        megablast_filtered = filterBlastResult_megablast(megablast_txt)
+        matchTaxonomyToBlastResult_megablast(megablast_filtered)
 
         blastx_tmp = diamondBlastx(contigs)
         blastx_txt = add_header_3(blastx_tmp)
-        filterBlastResult_3(blastx_txt)
+        blastx_filtered = filterBlastResult_blastx(blastx_txt)
+        matchTaxonomyToBlastResult_blastx(blastx_filtered)
 }
 
 process blastn {
@@ -110,9 +113,9 @@ process add_header_1 {
     input:
         path tmp
     output:
-        path "${tmp.baseName}.txt"
+        path "${tmp.baseName}.tmp"
     """
-    cat ${params.pipeline_directory}/headers/blast_header $tmp > ${tmp.baseName}.txt
+    cat ${params.pipeline_directory}/headers/blast_header $tmp > ${tmp.baseName}headered.tmp
     """
 }
 
@@ -120,9 +123,9 @@ process add_header_2 {
     input:
         path tmp
     output:
-        path "${tmp.baseName}.txt"
+        path "${tmp.baseName}.tmp"
     """
-    cat ${params.pipeline_directory}/headers/blast_header $tmp > ${tmp.baseName}.txt
+    cat ${params.pipeline_directory}/headers/blast_header $tmp > ${tmp.baseName}.headered.tmp
     """
 }
 
@@ -130,54 +133,96 @@ process add_header_3 {
     input:
         path tmp
     output:
-        path "${tmp.baseName}.txt"
+        path "${tmp.baseName}.headered.tmp"
     """
-    cat ${params.pipeline_directory}/headers/blast_header $tmp > ${tmp.baseName}.txt
+    cat ${params.pipeline_directory}/headers/blast_header $tmp > ${tmp.baseName}.headered.tmp
     """
 }
 
-process filterBlastResult_1 {
-    publishDir "${params.outdir}/analysis", mode: 'copy'
+process filterBlastResult_blastn {
     conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
     label "containerPython"
 
     input:
         path txt
     output:
-        path "${txt.baseName}.filtered.txt"
+        path "${txt.baseName}.filtered.tmp"
 
     """
-    python ${params.pipeline_directory}/scripts/blast_filter.py --input $txt --output ${txt.baseName}.filtered.txt --exclude ${params.exclude_keyword_file} --aln_len 100 --aln_contig_len_prop 0.5
+    python ${params.pipeline_directory}/scripts/blast_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --exclude ${params.exclude_keyword_file} --aln_len 100 --aln_contig_len_prop 0.5
     """
 }
 
-process filterBlastResult_2 {
-    publishDir "${params.outdir}/analysis", mode: 'copy'
+process filterBlastResult_megablast {
     conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
     label "containerPython"
 
     input:
         path txt
     output:
-        path "${txt.baseName}.filtered.txt"
+        path "${txt.baseName}.filtered.tmp"
 
     """
-    python ${params.pipeline_directory}/scripts/blast_filter.py --input $txt --output ${txt.baseName}.filtered.txt --exclude ${params.exclude_keyword_file} --aln_len 100 --aln_contig_len_prop 0.5
+    python ${params.pipeline_directory}/scripts/blast_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --exclude ${params.exclude_keyword_file} --aln_len 100 --aln_contig_len_prop 0.5
     """
 }
 
-process filterBlastResult_3 {
-    publishDir "${params.outdir}/analysis", mode: 'copy'
+process filterBlastResult_blastx {
     conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
     label "containerPython"
 
     input:
         path txt
     output:
-        path "${txt.baseName}.filtered.txt"
+        path "${txt.baseName}.filtered.tmp"
 
     """
-    python ${params.pipeline_directory}/scripts/blast_filter.py --input $txt --output ${txt.baseName}.filtered.txt --exclude ${params.exclude_keyword_file} --aln_len 33 --aln_contig_len_prop 0.17
+    python ${params.pipeline_directory}/scripts/blast_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --exclude ${params.exclude_keyword_file} --aln_len 33 --aln_contig_len_prop 0.17
+    """
+}
+
+process matchTaxonomyToBlastResult_blastn {
+    publishDir "${params.outdir}/analysis", mode: 'copy'
+    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    label "containerR"
+
+    input:
+        path txt
+    output:
+        path "${txt.simpleName}.blastn.txt"
+
+    """
+    Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.blastn.txt
+    """
+}
+
+process matchTaxonomyToBlastResult_megablast {
+    publishDir "${params.outdir}/analysis", mode: 'copy'
+    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    label "containerR"
+
+    input:
+        path txt
+    output:
+        path "${txt.simpleName}.megablast.txt"
+
+    """
+    Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.megablast.txt
+    """
+}
+
+process matchTaxonomyToBlastResult_blastx {
+    publishDir "${params.outdir}/analysis", mode: 'copy'
+    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    label "containerR"
+
+    input:
+        path txt
+    output:
+        path "${txt.simpleName}.blastx.txt"
+
+    """
+    Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.blastx.txt
     """
 }
 
