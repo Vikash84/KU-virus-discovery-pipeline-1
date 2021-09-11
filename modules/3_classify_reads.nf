@@ -1,32 +1,78 @@
 nextflow.enable.dsl=2
 
-workflow classify_reads {
+workflow classify_reads_illumina {
+    take:
+        pe1
+        pe2
+    main:
+        kraken_result = kraken2_illumina(pe1, pe2)
+        kreport2krona(kraken_result)
+        kreport2heatmap(kraken_result)
+        //kaiju_results = kaiju_illumina(filtered)
+        //kaiju2krona(kaiju_results)
+}
+
+workflow classify_reads_nanopore {
     take:
         filtered
     main:
-        kraken_results = kraken2(filtered)
-        kreport2krona(kraken_results[0])
-        kaiju_results = kaiju(filtered)
-        kaiju2krona(kaiju_results[2])
+        kraken_result = kraken2_nanopore(filtered)
+        kreport2krona(kraken_result)
+        kreport2heatmap(kraken_result)
+        kaiju_result = kaiju_nanopore(filtered)
+        kaiju2krona(kaiju_result)
 }
 
-process kraken2 {
+process kreport2heatmap {
     publishDir "${params.outDir}/classification", mode: 'copy'
+    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    label "containerMetaComp"
+
+    input:
+        path kraken_report
+    output:
+        path path "${params.prefix}.heatmap.png"
+    """
+    perl ${params.pipeline_directory}/convert_krakenRep2list.pl < $kraken_report > ${params.prefix}.list
+    Rscript ${params.pipeline_directory}/make_heatmap_with_metacomp.R ${params.prefix}.list ${params.prefix}.heatmap.png
+    """
+}
+
+process kraken2_illumina {
+    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    label "containerKraken"
+    input:
+        path pe1
+        path pe2
+    output:
+        path "${params.prefix}.kraken_report.csv"
+    """
+    echo "Classify reads into taxonomy with Kraken2"
+    echo "sample name: $params.prefix"
+    echo "input file 1: $pe1"
+    echo "input file 2: $pe2"
+    echo "kraken db path: $params.kraken_db_path"
+    kraken2 --db $params.kraken_db_path \
+        --report ${params.prefix}.kraken_report.csv \
+        --paired \
+        $pe1 $pe2
+    """
+}
+
+process kraken2_nanopore {
     conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
     label "containerKraken"
     input:
         path fastq
     output:
-        path "${params.prefix}.kraken_report.txt"
-        path "${params.prefix}.kraken_output.txt"
+        path "${params.prefix}.kraken_report.csv"
     """
     echo "Classify reads into taxonomy with Kraken2"
     echo "sample name: $params.prefix"
     echo "query file: $fastq"
     echo "kraken db path: $params.kraken_db_path"
     kraken2 --db $params.kraken_db_path \
-        --report ${params.prefix}.kraken_report.txt \
-        --output ${params.prefix}.kraken_output.txt \
+        --report ${params.prefix}.kraken_report.csv \
         $fastq
     """
 }
@@ -47,15 +93,13 @@ process kreport2krona {
     """
 }
 
-process kaiju {
+process kaiju_nanopore {
     publishDir "${params.outDir}/classification", mode: 'copy'
     conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
     label "containerKaiju"
     input:
         path fastq
     output:
-        path "${params.prefix}.kaiju.out"
-        path "${params.prefix}.kaiju_summary.tsv"
         path "${params.prefix}.kaiju.out.krona"
     """
     echo "Classify reads into taxonomy with Kaiju"
