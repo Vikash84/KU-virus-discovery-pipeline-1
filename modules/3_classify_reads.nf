@@ -34,7 +34,7 @@ process kreport2heatmap {
         path path "${params.prefix}.heatmap.png"
     """
     perl ${params.pipeline_directory}/convert_krakenRep2list.pl < $kraken_report > ${params.prefix}.list
-    Rscript ${params.pipeline_directory}/make_heatmap_with_metacomp.R ${params.prefix}.list ${params.prefix}.heatmap.png
+    Rscript ${params.pipeline_directory}/make_heatmap_with_metacomp.R ${params.prefix}.list
     """
 }
 
