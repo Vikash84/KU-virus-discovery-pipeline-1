@@ -6,7 +6,8 @@ workflow classify_reads_illumina {
     main:
         kraken_result = kraken2_illumina(filtered_fastqs)
         kreport2krona(kraken_result)
-        kreport2heatmap(kraken_result)
+        edge_form = kreport2EDGEform(kraken_result)
+        kreport2heatmap(edge_form)
         //kaiju_results = kaiju_illumina(filtered)
         //kaiju2krona(kaiju_results)
 }
@@ -17,25 +18,39 @@ workflow classify_reads_nanopore {
     main:
         kraken_result = kraken2_nanopore(filtered)
         kreport2krona(kraken_result)
-        kreport2heatmap(kraken_result)
+        edge_form = kreport2EDGEform(kraken_result)
+        kreport2heatmap(edge_form)
         kaiju_result = kaiju_nanopore(filtered)
         kaiju2krona(kaiju_result)
 }
 
-process kreport2heatmap {
+process kreport2EDGEform {
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
+    label "containerKrona"
+
+    input:
+        path kraken_report
+    output:
+        path "${params.prefix}.list"
+
+    """
+    perl ${params.pipeline_directory}/scripts/convert_krakenRep2list.pl < $kraken_report > ${params.prefix}.list
+    """
+}
+
+process EDGEform2heatmap {
     publishDir "${params.outDir}/classification", mode: 'copy'
     conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     label "containerMetaComp"
 
     input:
-        path kraken_report
+        path edge_form
     output:
         path "${params.prefix}_phylum.svg"
         path "${params.prefix}_family.svg"
         path "${params.prefix}_species.svg"
     """
-    perl ${params.pipeline_directory}/scripts/convert_krakenRep2list.pl < $kraken_report > ${params.prefix}.list
-    Rscript ${params.pipeline_directory}/scripts/make_heatmap_with_metacomp.R ${params.prefix}.list ${params.prefix}
+    Rscript ${params.pipeline_directory}/scripts/make_heatmap_with_metacomp.R ${edge_form} ${params.prefix}
     """
 }
 
