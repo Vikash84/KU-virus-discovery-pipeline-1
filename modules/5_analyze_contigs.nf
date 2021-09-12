@@ -115,7 +115,7 @@ process add_header_1 {
     output:
         path "${tmp.baseName}.headered.tmp"
     """
-    cat ${params.pipeline_directory}/headers/blast_header $tmp > ${tmp.baseName}headered.tmp
+    cat ${params.pipeline_directory}/headers/blast_header $tmp > ${tmp.baseName}.headered.tmp
     """
 }
 
@@ -192,7 +192,7 @@ process matchTaxonomyToBlastResult_blastn {
         path "${txt.simpleName}.blastn.txt"
 
     """
-    Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.blastn.txt
+    Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.blastn.txt ${params.taxonomizr_db_path}
     """
 }
 
@@ -207,7 +207,7 @@ process matchTaxonomyToBlastResult_megablast {
         path "${txt.simpleName}.megablast.txt"
 
     """
-    Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.megablast.txt
+    Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.megablast.txt ${params.taxonomizr_db_path}
     """
 }
 
@@ -222,7 +222,7 @@ process matchTaxonomyToBlastResult_blastx {
         path "${txt.simpleName}.blastx.txt"
 
     """
-    Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${params.taxonomizr_db_path}
+    Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.blastx.txt ${params.taxonomizr_db_path}
     """
 }
 
