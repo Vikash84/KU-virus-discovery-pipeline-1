@@ -51,7 +51,7 @@ process decompress_fastq {
 
 process deduplication {
     label "containerPrinSeq"
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
 
     input:
         tuple path(pe1), path(pe2)
@@ -65,7 +65,7 @@ process deduplication {
 
 process trimmomatic {
     label "containerPython"
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     input:
         tuple path(pe1), path(pe2)
     output:
@@ -85,7 +85,7 @@ process trimmomatic {
 
 process nanofilt {
     label "containerPython"
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     input:
         path fastq
     output:
@@ -106,7 +106,7 @@ process hostfilter_illumina {
 //    errorStrategy { 'ignore' }
 
     label "containerBowtie2"
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
 
     input:
         tuple path(pe1), path(pe2)
@@ -128,7 +128,7 @@ process hostfilter_nanopore {
 //    errorStrategy { 'ignore' }
 
     label "containerHostfilter"
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     
     input:
         path fastq

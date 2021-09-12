@@ -52,7 +52,7 @@ process split_fastq_tuple {
 process each_ref_mapping_illumina {
     errorStrategy 'ignore'
     label "containerBowtie2"
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     stageInMode "link"
 
     input:
@@ -83,7 +83,7 @@ process each_ref_mapping_nanopore {
 
 process mapping_summary {
     errorStrategy 'ignore'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     stageInMode 'link'
 
     input:
@@ -101,7 +101,7 @@ process mapping_summary {
 
 process filter {
     publishDir "${params.outdir}/mapping", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerPython"
 
     input:

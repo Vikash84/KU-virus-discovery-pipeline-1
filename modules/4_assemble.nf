@@ -25,7 +25,7 @@ workflow assemble_nanopore {
 }
 
 process filterContigs {
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     publishDir "${params.outdir}/assembly", mode: 'copy'
     label "containerBbmap"
 
@@ -40,7 +40,7 @@ process filterContigs {
 
 process contigSummary {
     publishDir "${params.outdir}/assembly", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     input:
         path contigs
     output:
@@ -53,7 +53,7 @@ process contigSummary {
 
 process spades{
     errorStrategy { 'ignore' }
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerSpades"
     input:
         tuple path(pe1), path(pe2)
@@ -70,7 +70,7 @@ process spades{
 
 process megahit {
     errorStrategy { 'ignore' }
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     publishDir "${params.outdir}/assembly", mode: 'copy'
     label "containerMegahit"
     input:

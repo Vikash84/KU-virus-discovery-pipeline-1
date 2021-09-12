@@ -25,7 +25,7 @@ workflow classify_reads_nanopore {
 
 process kreport2heatmap {
     publishDir "${params.outDir}/classification", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     label "containerMetaComp"
 
     input:
@@ -41,7 +41,7 @@ process kreport2heatmap {
 }
 
 process kraken2_illumina {
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerKraken"
     input:
         path pe1
@@ -62,7 +62,7 @@ process kraken2_illumina {
 }
 
 process kraken2_nanopore {
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerKraken"
     input:
         path fastq
@@ -81,7 +81,7 @@ process kraken2_nanopore {
 
 process kreport2krona {
     publishDir "${params.outDir}/classification", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerKrona"
     input:
         path kraken_report
@@ -97,7 +97,7 @@ process kreport2krona {
 
 process kaiju_nanopore {
     publishDir "${params.outDir}/classification", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerKaiju"
     input:
         path fastq
@@ -120,7 +120,7 @@ process kaiju_nanopore {
 
 process kaiju2krona {
     publishDir "${params.outDir}/classification", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerKrona"
     input:
         path kaiju_krona
@@ -136,7 +136,7 @@ process kaiju2krona {
 process bracken {
     errorStrategy 'ignore'
     publishDir "${params.outDir}/classification", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerBracken"
     input:
         path kraken_report

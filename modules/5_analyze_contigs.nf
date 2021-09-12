@@ -27,7 +27,7 @@ workflow analyze_contigs {
 }
 
 process blastn {
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerBlast"
     
     input:
@@ -43,7 +43,7 @@ process blastn {
 }
 
 process diamondBlastx {
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerDiamond"
 
     input:
@@ -57,7 +57,7 @@ process diamondBlastx {
 
 process makeHtmlFromBlastAln_1 {
     publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerBlast"
 
     input:
@@ -71,7 +71,7 @@ process makeHtmlFromBlastAln_1 {
 
 process makeHtmlFromBlastAln_2 {
     publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerBlast"
 
     input:
@@ -84,7 +84,7 @@ process makeHtmlFromBlastAln_2 {
 }
 
 process makeTxtFromBlastAln_1 {
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerBlast"
 
     input:
@@ -97,7 +97,7 @@ process makeTxtFromBlastAln_1 {
 }
 
 process makeTxtFromBlastAln_2 {
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerBlast"
 
     input:
@@ -140,7 +140,7 @@ process add_header_3 {
 }
 
 process filterBlastResult_blastn {
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerPython"
 
     input:
@@ -154,7 +154,7 @@ process filterBlastResult_blastn {
 }
 
 process filterBlastResult_megablast {
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerPython"
 
     input:
@@ -168,7 +168,7 @@ process filterBlastResult_megablast {
 }
 
 process filterBlastResult_blastx {
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerPython"
 
     input:
@@ -183,7 +183,7 @@ process filterBlastResult_blastx {
 
 process matchTaxonomyToBlastResult_blastn {
     publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     label "containerR"
 
     input:
@@ -198,7 +198,7 @@ process matchTaxonomyToBlastResult_blastn {
 
 process matchTaxonomyToBlastResult_megablast {
     publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     label "containerR"
 
     input:
@@ -213,7 +213,7 @@ process matchTaxonomyToBlastResult_megablast {
 
 process matchTaxonomyToBlastResult_blastx {
     publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     label "containerR"
 
     input:
@@ -228,7 +228,7 @@ process matchTaxonomyToBlastResult_blastx {
 
 process vibrant {
     publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerVibrant"
 
     input:
@@ -243,7 +243,7 @@ process vibrant {
 process deepvirfinder {
     errorStrategy 'ignore'
     publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerDVF"
 
     input:
@@ -259,7 +259,7 @@ process deepvirfinder {
 process parse_and_prokka {
     errorStrategy 'ignore'
     publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/ku_vdp"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerBlast"
 
     input:
