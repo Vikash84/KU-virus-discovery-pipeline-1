@@ -2,7 +2,7 @@ nextflow.enable.dsl=2
 include { qc_illumina } from './modules/0_qc'
 include { filter_illumina } from './modules/1_filter'
 include { reference_map_illumina } from './modules/2_reference_map'
-include { classify_reads } from './modules/3_classify_reads'
+include { classify_reads_illumina } from './modules/3_classify_reads'
 include { assemble_illumina } from './modules/4_assemble'
 include { analyze_contigs } from './modules/5_analyze_contigs'
 
