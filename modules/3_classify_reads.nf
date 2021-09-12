@@ -2,10 +2,9 @@ nextflow.enable.dsl=2
 
 workflow classify_reads_illumina {
     take:
-        pe1
-        pe2
+        filtered_fastqs
     main:
-        kraken_result = kraken2_illumina(pe1, pe2)
+        kraken_result = kraken2_illumina(filtered_fastqs)
         kreport2krona(kraken_result)
         kreport2heatmap(kraken_result)
         //kaiju_results = kaiju_illumina(filtered)
@@ -35,8 +34,8 @@ process kreport2heatmap {
         path "${params.prefix}_family.svg"
         path "${params.prefix}_species.svg"
     """
-    perl ${params.pipeline_directory}/script/convert_krakenRep2list.pl < $kraken_report > ${params.prefix}.list
-    Rscript ${params.pipeline_directory}/script/make_heatmap_with_metacomp.R ${params.prefix}.list ${params.prefix}
+    perl ${params.pipeline_directory}/scripts/convert_krakenRep2list.pl < $kraken_report > ${params.prefix}.list
+    Rscript ${params.pipeline_directory}/scripts/make_heatmap_with_metacomp.R ${params.prefix}.list ${params.prefix}
     """
 }
 
@@ -44,8 +43,7 @@ process kraken2_illumina {
     conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerKraken"
     input:
-        path pe1
-        path pe2
+        tuple path(pe1), path(pe2)
     output:
         path "${params.prefix}.kraken_report.csv"
     """

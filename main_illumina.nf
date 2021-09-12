@@ -40,7 +40,7 @@ workflow {
         reference_map_illumina(filtered)
 
         // read taxon classification
-        classify_reads_illumina(fastq1, fastq2)
+        classify_reads_illumina(filtered)
 
         // de novo assembly
         contigs = assemble_illumina(filtered)
