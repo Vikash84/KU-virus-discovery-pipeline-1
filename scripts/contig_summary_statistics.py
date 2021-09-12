@@ -18,7 +18,7 @@ if __name__ == '__main__':
     data_q3 = int(quartiles[2])
 
     # write summary to output file
-    output_file = open(prefix + ".contig.summary.txt", "w")
+    output_file = open(prefix + ".contig_summary.txt", "w")
     output_file.write("Number of assembled contigs: " + str(num_seq)+'\n')
     output_file.write("Min length: " + str(data_min) + "bp"+'\n')
     output_file.write("Q1 length: " + str(data_q1) + "bp"+'\n')
@@ -34,4 +34,4 @@ if __name__ == '__main__':
 )
     plt.xlabel("Sequence length (bp)")
     plt.ylabel("Count")
-    plt.savefig(prefix + ".contigs.length_histogram.png")
+    plt.savefig(prefix + ".contigs_length_histogram.png")

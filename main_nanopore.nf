@@ -29,19 +29,19 @@ workflow {
         fastq = channel.fromPath(params.fastq, checkIfExists:true)
 
         // fastq quality control
-        qc_nanopore(fastq)
+//        qc_nanopore(fastq)
 
         // filter too short/low quality and host-derived reads
-        filtered = filter_nanopore(fastq)
+//        filtered = filter_nanopore(fastq)
 
         // reference mapping with provided virus sequence lists
-        reference_map_nanopore(filtered)
+//        reference_map_nanopore(filtered)
 
         // read taxon classification
-        classify_reads_nanopore(filtered)
+//        classify_reads_nanopore(filtered)
 
         // de novo assembly
-        contigs = assemble_nanopore(filtered)
+        contigs = assemble_nanopore(fastq)
 
         // post-assembly work
         polished_contigs = polish(contigs, fastq)
