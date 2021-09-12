@@ -113,7 +113,7 @@ process add_header_1 {
     input:
         path tmp
     output:
-        path "${tmp.baseName}.tmp"
+        path "${tmp.baseName}.headered.tmp"
     """
     cat ${params.pipeline_directory}/headers/blast_header $tmp > ${tmp.baseName}headered.tmp
     """
@@ -123,7 +123,7 @@ process add_header_2 {
     input:
         path tmp
     output:
-        path "${tmp.baseName}.tmp"
+        path "${tmp.baseName}.headered.tmp"
     """
     cat ${params.pipeline_directory}/headers/blast_header $tmp > ${tmp.baseName}.headered.tmp
     """
