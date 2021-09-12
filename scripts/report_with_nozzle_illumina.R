@@ -66,6 +66,8 @@ p <- add_argument(p, "--megablast_table", help="Megablast result file path")
 
 p <- add_argument(p, "--blastx_table", help="Blastx result file path")
 
+p <- add_argument(p, "--blast_table_output_dir", help="Ouput directory path where blast html files will be stored")
+
 # get command line options, if help option encountered print help and exit,
 # otherwise if options not found on command line then set defaults, 
 args <- parse_args(p)
