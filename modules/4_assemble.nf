@@ -47,7 +47,7 @@ process contigSummary {
         path "${params.prefix}.contig_summary.txt"
         path "${params.prefix}.contigs_length_histogram.png"
     """
-    python ${params.pipeline_directory}/script/contig_summary_statistics.py $params.prefix $contigs
+    python ${params.pipeline_directory}/scripts/contig_summary_statistics.py $params.prefix $contigs
     """
 }
 
