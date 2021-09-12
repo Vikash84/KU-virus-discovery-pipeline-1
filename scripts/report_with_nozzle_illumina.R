@@ -75,7 +75,8 @@ prefix <- args$prefix
 
 # qc data
 
-if(args$multiqc_html == ""){
+
+if(is.na(args$multiqc_html)){
   qc_link <- paste(prefix, "/qc/multiqc_report.html", sep="")
 } else{
   qc_link <- args$multiqc_html
@@ -83,7 +84,7 @@ if(args$multiqc_html == ""){
 
 # reference mapping data
 
-if(args$mapping_summary == ""){
+if(is.na(args$mapping_summary)){
   ref_map_summary_file <- paste(prefix, "/mapping/", prefix, ".filtered_reference_mapping_collection.txt", sep="")
 } else{
   ref_map_summary_file <- args$mapping_summary
@@ -91,7 +92,7 @@ if(args$mapping_summary == ""){
 
 # classification heatmap image files
 
-if(args$classification_result_folder==""){
+if(is.na(args$classification_result_folder)){
   base_dir_path <- paste(prefix, "/classification", sep="")
 } else{
   base_dir_path <- args$classification_result_folder
@@ -99,7 +100,7 @@ if(args$classification_result_folder==""){
 
 # de novo assembly data
 
-if(args$assembly_summary==""){
+if(is.na(args$assembly_summary)){
   assemble_summary_file <- paste(prefix, "/assembly/", prefix, ".contig_summary.txt", sep="")
   assemble_contig_length_histogram_file <- paste(prefix, "/assembly/", prefix, ".contigs_length_histogram.png", sep="")
 } else{
@@ -108,19 +109,19 @@ if(args$assembly_summary==""){
 
 # blast data
 
-if(args$blastn_table==""){
+if(is.na(args$blastn_table)){
   blast_blastn_file <- paste(prefix, "/analysis/", prefix, ".blastn.txt", sep="")
 } else{
   blast_blastn_file <- args$blastn_table
 }
 
-if(args$megablast_table==""){
+if(is.na(args$megablast_table)){
   blast_megablast_file <- paste(prefix, "/analysis/", prefix, ".megablast.txt", sep="")
 } else{
   blast_megablast_file <- args$megablast_table
 }
 
-if(args$blastx_table==""){
+if(is.na(args$blastx_table)){
   blast_blastx_file <- paste(prefix, "/analysis/", prefix, ".blastx.txt", sep="")
 } else{
   blast_blastx_file <- args$blastx_table
