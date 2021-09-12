@@ -63,7 +63,7 @@ process spades{
     echo "De novo assembly with Spades"
     echo "input file 1: $pe1"
     echo "input file 2: $pe2"
-    spades.py --pe1-1 $pe1 --pe1-2 $pe2 -o ${params.prefix} --meta
+    spades.py --pe1-1 $pe1 --pe1-2 $pe2 -o ${params.prefix} --meta -t 12
     mv "${params.prefix}/contigs.fasta" "${params.prefix}.spades.contigs.fasta"
     """
 }
@@ -80,7 +80,7 @@ process megahit {
     """
     echo "De novo assembly with Megahit"
     echo "input file: $fastq"
-    megahit -r $fastq -o $params.prefix --out-prefix $params.prefix 
+    megahit -r $fastq -o $params.prefix --out-prefix $params.prefix -t 12 
     mv ${params.prefix}/${params.prefix}.contigs.fa ${params.prefix}.megahit.contigs.fa
     """
 }

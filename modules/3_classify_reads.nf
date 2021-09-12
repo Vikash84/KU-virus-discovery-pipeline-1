@@ -69,7 +69,7 @@ process kraken2_illumina {
     echo "kraken db path: $params.kraken_db_path"
     kraken2 --db $params.kraken_db_path \
         --report ${params.prefix}.kraken_report.csv \
-        --paired \
+        --paired --threads 12 \
         $pe1 $pe2
     """
 }
@@ -88,7 +88,7 @@ process kraken2_nanopore {
     echo "kraken db path: $params.kraken_db_path"
     kraken2 --db $params.kraken_db_path \
         --report ${params.prefix}.kraken_report.csv \
-        $fastq
+        --threads 12 $fastq
     """
 }
 

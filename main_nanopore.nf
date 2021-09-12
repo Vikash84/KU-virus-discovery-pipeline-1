@@ -32,7 +32,7 @@ workflow {
 //        qc_nanopore(fastq)
 
         // filter too short/low quality and host-derived reads
-//        filtered = filter_nanopore(fastq)
+        filtered = filter_nanopore(fastq)
 
         // reference mapping with provided virus sequence lists
 //        reference_map_nanopore(filtered)

@@ -37,8 +37,8 @@ process blastn {
         path "${params.prefix}.megablast.aln"
 
     """
-    blastn -query $contigs -db $params.blastn_db_path -task blastn -evalue 1.0e-5 -max_target_seqs 1 -outfmt 11 > ${params.prefix}.blastn.aln
-    blastn -query $contigs -db $params.blastn_db_path -task megablast -evalue 1.0e-5 -max_target_seqs 1 -outfmt 11 > ${params.prefix}.megablast.aln
+    blastn -query $contigs -db $params.blastn_db_path -task blastn -evalue 1.0e-5 -max_target_seqs 1 -outfmt 11 -num_threads 12 > ${params.prefix}.blastn.aln
+    blastn -query $contigs -db $params.blastn_db_path -task megablast -evalue 1.0e-5 -max_target_seqs 1 -outfmt 11 -num_threads 12 > ${params.prefix}.megablast.aln
    """
 }
 

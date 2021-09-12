@@ -31,16 +31,16 @@ workflow {
         fastq2 = channel.fromPath(params.fastq2, checkIfExists:true)
 
         // fastq quality control
-        qc_illumina(fastq1, fastq2)
+//        qc_illumina(fastq1, fastq2)
 
         // filter too short/low quality and host-derived reads
         filtered = filter_illumina(fastq1, fastq2)
 
         // reference mapping with provided virus sequence lists
-        reference_map_illumina(filtered)
+//        reference_map_illumina(filtered)
 
         // read taxon classification
-        classify_reads_illumina(filtered)
+//        classify_reads_illumina(filtered)
 
         // de novo assembly
         contigs = assemble_illumina(filtered)
