@@ -15,7 +15,7 @@ if(params.help) {
     log.info '    nextflow run main.nf [options]'
     log.info ''
     log.info 'Script Options: '
-    log.info '    --input        FILE    Path to FASTQ file'
+    log.info '    --fastq        FILE    Path to FASTQ file'
     log.info '    --prefix        STR    Nickname given to sample'
     log.info '    --outdir         DIR      Name of output directory'
     log.info ''
@@ -26,7 +26,7 @@ if(params.help) {
 // workflow module
 workflow {
     main:
-        fastq = channel.fromPath(params.input, checkIfExists:true)
+        fastq = channel.fromPath(params.fastq, checkIfExists:true)
 
         // fastq quality control
         qc_nanopore(fastq)

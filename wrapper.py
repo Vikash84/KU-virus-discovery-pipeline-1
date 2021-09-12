@@ -133,9 +133,9 @@ def parseArgsDictToCmd(args_dict):
     cmd = ""
     cmd = nextflow_path + "nextflow run " + nextflow_script_path 
     if args_dict["sequencing_type"] == "illumina":
-        cmd = cmd + "main_nanopore.nf "
-    else:
         cmd = cmd + "main_illumina.nf "
+    else:
+        cmd = cmd + "main_nanopore.nf "
     for key in (k for k in args_dict.keys() if k != "seq_type"):
         cmd += "--" + key + " " + args_dict[key] + " "
     return cmd

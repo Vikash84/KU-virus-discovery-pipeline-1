@@ -14,8 +14,8 @@ if(params.help) {
     log.info '    nextflow run main.nf [options]'
     log.info ''
     log.info 'Script Options: '
-    log.info '    --pe1        FILE    Path to first paired-end FASTQ file'
-    log.info '    --pe2        FILE    Path to second paired-end FASTQ file'
+    log.info '    --fastq        FILE    Path to first paired-end FASTQ file'
+    log.info '    --fastq2        FILE    Path to second paired-end FASTQ file'
     log.info '    --prefix        STR    Nickname given to sample'
     log.info '    --outdir         DIR      Name of output directory'
     log.info ''
@@ -27,8 +27,8 @@ if(params.help) {
 // workflow module
 workflow {
     main:
-        fastq1 = channel.fromPath(params.pe1, checkIfExists:true)
-        fastq2 = channel.fromPath(params.pe2, checkIfExists:true)
+        fastq1 = channel.fromPath(params.fastq, checkIfExists:true)
+        fastq2 = channel.fromPath(params.fastq2, checkIfExists:true)
 
         // fastq quality control
         qc_illumina(fastq1, fastq2)
