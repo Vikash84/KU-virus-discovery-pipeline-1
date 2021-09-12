@@ -3,7 +3,7 @@
 # Author: Kijin Kim (skkujin@gmail.com)
 ###############################################################
 
-suppressPackageStartupMessages(library("argparse"))
+suppressPackageStartupMessages(library("argparser"))
 require( "Nozzle.R1" );
 require("dplyr");
 require("data.table");
@@ -47,9 +47,6 @@ uniq_ref_species <- function(blastTable) {
 parser <- ArgumentParser()
   
 # --- Script parameter parsing ---
-
-parser$add_argument("-h", "--help", action="store_true", default=FALSE,
-                    help="show this help message and exit")
 
 parser$add_argument("-p", "--prefix", nargs=1, help="Sample prefix")
 
