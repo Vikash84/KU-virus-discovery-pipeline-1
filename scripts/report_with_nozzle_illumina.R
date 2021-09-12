@@ -44,40 +44,31 @@ uniq_ref_species <- function(blastTable) {
 }
 
 # create parser object
-parser <- ArgumentParser()
+p <- arg_parser("Report generating program")
   
 # --- Script parameter parsing ---
 
-parser$add_argument("-p", "--prefix", nargs=1, help="Sample prefix")
+p <- add_argument(p, c("-p", "--prefix"), help="Sample prefix")
 
-parser$add_argument("--multiqc_html", 
-                    help="Multiqc html file path",
-                    metavar="multiqc_report.html")
-parser$add_argument("--mapping_summary", 
-                    help="Reference mapping summary file path",
-                    metavar="filtered_reference_mapping_collection.txt")
-parser$add_argument("--classification_result_folder", 
-                    help="The directory path where heatmap files exist",
-                    metavar="classifcation/")
-parser$add_argument("--assembly_summary", 
-                    help="Contigs summary file path",
-                    metavar="contig_summary.txt")
-parser$add_argument("--assembly_length_histogram", 
-                    help="Contigs length histogram file path",
-                    metavar="contigs_length_histogram.png")
-parser$add_argument("--blastn_table", 
-                    help="Blastn result file path",
-                    metavar="blastn.txt")
-parser$add_argument("--megablast_table", 
-                    help="Megablast result file path",
-                    metavar="megablast.txt")
-parser$add_argument("--blastx_table", 
-                    help="Blastx result file path",
-                    metavar="blastx.txt")
+p <- add_argument(p, "--multiqc_html", help="Multiqc html file path")
+
+p <- add_argument(p, "--mapping_summary", help="Reference mapping summary file path")
+
+p <- add_argument(p, "--classification_result_folder", help="The directory path where heatmap files exist")
+
+p <- add_argument(p, "--assembly_summary", help="Contigs summary file path")
+
+p <- add_argument(p, "--assembly_length_histogram", help="Contigs length histogram file path")
+
+p <- add_argument(p, "--blastn_table", help="Blastn result file path")
+
+p <- add_argument(p, "--megablast_table", help="Megablast result file path")
+
+p <- add_argument(p, "--blastx_table", help="Blastx result file path")
 
 # get command line options, if help option encountered print help and exit,
 # otherwise if options not found on command line then set defaults, 
-args <- parser$parse_args()
+args <- parse_args(p)
 
 prefix <- args$prefix
 
