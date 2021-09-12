@@ -48,7 +48,7 @@ p <- arg_parser("Report generating program")
   
 # --- Script parameter parsing ---
 
-p <- add_argument(p, c("-p", "--prefix"), help="Sample prefix")
+p <- add_argument(p, "--prefix", help="Sample prefix")
 
 p <- add_argument(p, "--multiqc_html", help="Multiqc html file path")
 
