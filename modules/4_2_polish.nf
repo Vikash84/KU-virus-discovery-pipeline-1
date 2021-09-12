@@ -13,7 +13,7 @@ workflow polish {
 
 process racon {
     publishDir "${params.outdir}/assembly", mode: 'copy'
-
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerRacon"
     input:
         path contigs
@@ -33,7 +33,7 @@ process racon {
 
 process medaka {
     publishDir "${params.outdir}/assembly", mode: 'copy'
-
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerMedaka"
     input:
         path contigs

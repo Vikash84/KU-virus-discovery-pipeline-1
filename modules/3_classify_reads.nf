@@ -39,7 +39,7 @@ process kreport2EDGEform {
 }
 
 process EDGEform2heatmap {
-    publishDir "${params.outDir}/classification", mode: 'copy'
+    publishDir "${params.outdir}/classification", mode: 'copy'
     conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     label "containerMetaComp"
 
@@ -93,7 +93,7 @@ process kraken2_nanopore {
 }
 
 process kreport2krona {
-    publishDir "${params.outDir}/classification", mode: 'copy'
+    publishDir "${params.outdir}/classification", mode: 'copy'
     conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerKrona"
     input:
@@ -109,7 +109,7 @@ process kreport2krona {
 }
 
 process kaiju_nanopore {
-    publishDir "${params.outDir}/classification", mode: 'copy'
+    publishDir "${params.outdir}/classification", mode: 'copy'
     conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerKaiju"
     input:
@@ -132,7 +132,7 @@ process kaiju_nanopore {
 }
 
 process kaiju2krona {
-    publishDir "${params.outDir}/classification", mode: 'copy'
+    publishDir "${params.outdir}/classification", mode: 'copy'
     conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerKrona"
     input:
@@ -148,7 +148,7 @@ process kaiju2krona {
 
 process bracken {
     errorStrategy 'ignore'
-    publishDir "${params.outDir}/classification", mode: 'copy'
+    publishDir "${params.outdir}/classification", mode: 'copy'
     conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerBracken"
     input:
