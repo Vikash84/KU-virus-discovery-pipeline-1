@@ -7,7 +7,7 @@ workflow classify_reads_illumina {
         kraken_result = kraken2_illumina(filtered_fastqs)
         kreport2krona(kraken_result)
         edge_form = kreport2EDGEform(kraken_result)
-        kreport2heatmap(edge_form)
+        EDGEform2heatmap(edge_form)
         //kaiju_results = kaiju_illumina(filtered)
         //kaiju2krona(kaiju_results)
 }
@@ -19,7 +19,7 @@ workflow classify_reads_nanopore {
         kraken_result = kraken2_nanopore(filtered)
         kreport2krona(kraken_result)
         edge_form = kreport2EDGEform(kraken_result)
-        kreport2heatmap(edge_form)
+        EDGEform2heatmap(edge_form)
         kaiju_result = kaiju_nanopore(filtered)
         kaiju2krona(kaiju_result)
 }
