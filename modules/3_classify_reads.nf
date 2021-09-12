@@ -46,8 +46,9 @@ process EDGEform2heatmap {
     input:
         path edge_form
     output:
-        path "${params.prefix}_phylum.svg"
+        path "${params.prefix}_order.svg"
         path "${params.prefix}_family.svg"
+        path "${params.prefix}_genus.svg"
         path "${params.prefix}_species.svg"
     """
     Rscript ${params.pipeline_directory}/scripts/make_heatmap_with_metacomp.R ${edge_form} ${params.prefix}
