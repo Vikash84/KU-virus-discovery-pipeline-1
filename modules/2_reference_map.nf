@@ -69,6 +69,7 @@ process each_ref_mapping_illumina {
 }
 
 process each_ref_mapping_nanopore {
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     label "containerMinimap"
 
     input:
