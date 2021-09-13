@@ -158,7 +158,11 @@ if(is.na(args$blastx_table)){
 
 
 # reference mapping data
-ref_map_summary_table <- refMapFileToTable(ref_map_summary_file)
+if(file_test(ref_map_summary_file)){
+  ref_map_summary_table <- refMapFileToTable(ref_map_summary_file)
+} else{
+  ref_map_summary_table <- NA
+}
 #ref_map_virus_list <- 
 
 # classification heatmap image files
@@ -220,9 +224,12 @@ report <- setReportSubTitle( report, "A report that showcases results generated 
 
 multiqc_link <- newParagraph( asLink( "MultiQC report", url=qc_link ));
 
-ref_map_table <- newTable( ref_map_summary_table,
+if is.na(ref_map_summary_file) {
+  ref_map_table <- newParagraph ("Not mapped to any provided reference sequence.")
+} else{
+  ref_map_table <- newTable( ref_map_summary_table,
 				"Reference mapping summary. Column follows bamcov format.");
-
+}
 classification_order_heatmap <- newFigure(classification_order_heatmap_file, "Order-level heatmap")
 classification_family_heatmap <- newFigure(classification_family_heatmap_file, "Family-level heatmap")
 classification_genus_heatmap <- newFigure(classification_genus_heatmap_file, "Genus-level heatmap")
