@@ -30,7 +30,7 @@ blastFileToTable <- function(text_file) {
   ret$superkingdom <- as.factor(ret$superkingdom)
   ret$phylum <- as.factor(ret$phylum)
   ret$class <- as.factor(ret$class)
-  ret$order <- as.factor(ret$ordere)
+  ret$order <- as.factor(ret$order)
   ret$family <- as.factor(ret$family)
   ret$genus <- as.factor(ret$genus)
   ret$species <- as.factor(ret$species)
