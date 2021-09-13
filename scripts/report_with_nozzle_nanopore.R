@@ -230,7 +230,7 @@ report <- setReportSubTitle( report, "A report that showcases results generated 
 
 # create objects
 
-multiqc_link <- newParagraph( asLink( "MultiQC report", url=qc_link ));
+nanoplot_link <- newParagraph( asLink( "NanoPlot report", url=qc_link ));
 
 if (is.na(ref_map_summary_table)) {
   ref_map_table <- newParagraph ("Not mapped to any provided reference sequence.")
@@ -298,7 +298,7 @@ for ( i in 1:dim( blast_uniq_blastx_table )[1] )
 }
 
 report <- addToResults( report,
-				addTo( newSubSection( "QC" ), multiqc_link ),
+				addTo( newSubSection( "QC" ), nanoplot_link ),
 				addTo( newSubSection( "Reference Mapping" ), ref_map_table ), 
 				addTo( newSubSection( "Classification heatmap" ), classification_order_heatmap, classification_family_heatmap, classification_genus_heatmap, classification_species_heatmap, kraken_link, kaiju_link),
 				addTo( newSubSection( "Assembly Summary" ), assemble_table, assemble_contig_length_histogram_figure),
