@@ -41,7 +41,7 @@ workflow {
         classify_reads_nanopore(filtered)
 
         // de novo assembly
-        contigs = assemble_nanopore(fastq)
+        contigs = assemble_nanopore(filtered)
 
         // post-assembly work
         polished_contigs = polish(contigs, fastq)

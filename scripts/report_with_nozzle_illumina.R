@@ -79,7 +79,7 @@ prefix <- args$prefix
 
 
 if(is.na(args$multiqc_html)){
-  qc_link <- paste(getwd(), "/", prefix, "/qc/multiqc_report.html", sep="")
+  qc_link <- paste("qc/multiqc_report.html", sep="")
 } else{
   qc_link <- args$multiqc_html
 }
@@ -95,7 +95,7 @@ if(is.na(args$mapping_summary)){
 # classification heatmap image files
 
 if(is.na(args$classification_result_folder)){
-  base_dir_path <- paste(getwd(), "/", prefix, "/classification", sep="")
+  base_dir_path <- paste("classification", sep="")
 } else{
   base_dir_path <- args$classification_result_folder
 }
@@ -104,7 +104,7 @@ if(is.na(args$classification_result_folder)){
 
 if(is.na(args$assembly_summary)){
   assemble_summary_file <- paste(prefix, "/assembly/", prefix, ".contig_summary.txt", sep="")
-  assemble_contig_length_histogram_file <- paste(getwd(), "/", prefix, "/assembly/", prefix, ".contigs_length_histogram.png", sep="")
+  assemble_contig_length_histogram_file <- paste("assembly/", prefix, ".contigs_length_histogram.png", sep="")
 } else{
   assemble_summary_file <- args$assembly_summary
 }
@@ -162,20 +162,21 @@ table_header_order <- c("superkingdom", "phylum", "class", "order", "family", "g
 blast_blastn_table$TAXID <- as.factor(blast_blastn_table$TAXID)
 blast_blastn_table <- blast_blastn_table[, table_header_order]
 blastn_datatable <- datatable(blast_blastn_table, filter = 'top', options = list(pageLength = 20, autoWidth = TRUE))
-blastn_html_link <- paste(getwd(),"/",prefix, ".full_blastn_table.html", sep = "")
-saveWidget(blastn_datatable, blastn_html_link)
+blastn_html_link <- paste("analysis/", prefix, ".full_blastn_table.html", sep = "")
+saveWidget(blastn_datatable, paste(getwd(),"/",prefix,"/",blastn_html_link, sep=""))
 
 blast_megablast_table$TAXID <- as.factor(blast_megablast_table$TAXID)
 blast_megablast_table <- blast_megablast_table[, table_header_order]
 megablast_datatable <- datatable(blast_megablast_table, filter = 'top', options = list(pageLength = 20, autoWidth = TRUE))
-megablast_html_link <- paste(getwd(),"/",prefix, ".full_megablast_table.html", sep = "")
-saveWidget(megablast_datatable, megablast_html_link)
+megablast_html_link <- paste("analysis/", prefix, ".full_megablast_table.html", sep = "")
+saveWidget(megablast_datatable, paste(getwd(),"/",prefix,"/", megablast_html_link, sep=""))
 
 blast_blastx_table$TAXID <- as.factor(blast_blastx_table$TAXID)
 blast_blastx_table <- blast_blastx_table[, table_header_order]
 blastx_datatable <- datatable(blast_blastx_table, filter = 'top', options = list(pageLength = 20, autoWidth = TRUE))
-blastx_html_link <- paste(getwd(),"/",prefix, ".full_blastx_table.html", sep = "")
-saveWidget(blastx_datatable, blastx_html_link)
+blastx_html_link <- paste("analysis/", prefix, ".full_blastx_table.html", sep = "")
+saveWidget(blastx_datatable, paste(getwd(),"/",prefix,"/", blastx_html_link, sep=""))
+
 
 #===================================================================================================
 # Report
