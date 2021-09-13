@@ -26,12 +26,20 @@ AssembleSummaryFileToTable <- function(text_file) {
 blastFileToTable <- function(text_file) {
   ret <- read.table(text_file, header = TRUE, sep = "\t", strip.white = TRUE, quote="")
   ret$BITSCORE <- as.integer(ret$BITSCORE)
-  ret$species <- as.character(ret$species)
+  ret$TAXID <- as.factor(ret$TAXID)
+  ret$superkingdom <- as.factor(ret$superkingdom)
+  ret$phylum <- as.factor(ret$phylum)
+  ret$class <- as.factor(ret$class)
+  ret$order <- as.factor(ret$ordere)
+  ret$family <- as.factor(ret$family)
+  ret$genus <- as.factor(ret$genus)
+  ret$species <- as.factor(ret$species)
   return(ret)
 }
 
 uniq_ref_species <- function(blastTable) {
   ret <- blastTable[order(-blastTable$"BITSCORE"),]
+  ret$species <- as.character(ret$species)
   ret <- ret[!duplicated(ret[ , "species"]), ]
   cnt <- as.data.frame(table(blastTable$"species"))
   colnames(cnt) <- c("species", "NUM_CONTIGS")
@@ -39,6 +47,7 @@ uniq_ref_species <- function(blastTable) {
   ret <- inner_join(ret, cnt, by = "species")
   ret <- ret[c("NUM_CONTIGS", "species", "PER_IDENT", "EVALUE", "BITSCORE")]
   ret <- ret[order(-ret$"BITSCORE"),]
+  ret$species <- as.factor(ret$species)
   colnames(ret) <- c("NUM_CONTIGS", "REF_SPECIES", "BEST_PER_IDENT", "BEST_EVALUE", "BEST_BITSCORE")
   return(ret)
 }
@@ -179,19 +188,16 @@ blast_uniq_blastx_table <- uniq_ref_species(blast_blastx_table)
 
 table_header_order <- c("superkingdom", "phylum", "class", "order", "family", "genus", "species", "TAXID", "REF_ID", "REF_TITLE", "QUERY_ID", "REF_ID", "EVALUE", "BITSCORE", "PER_IDENT", "QUERY_LEN", "ALN_LEN", "MISMATCH", "GAPOPEN", "QSTART", "QEND", "REFSTART", "REFEND")
 
-blast_blastn_table$TAXID <- as.factor(blast_blastn_table$TAXID)
 blast_blastn_table <- blast_blastn_table[, table_header_order]
 blastn_datatable <- datatable(blast_blastn_table, filter = 'top', options = list(pageLength = 20, autoWidth = TRUE))
 blastn_html_link <- paste("analysis/", prefix, ".full_blastn_table.html", sep = "")
 saveWidget(blastn_datatable, paste(getwd(),"/",prefix,"/",blastn_html_link, sep=""))
 
-blast_megablast_table$TAXID <- as.factor(blast_megablast_table$TAXID)
 blast_megablast_table <- blast_megablast_table[, table_header_order]
 megablast_datatable <- datatable(blast_megablast_table, filter = 'top', options = list(pageLength = 20, autoWidth = TRUE))
 megablast_html_link <- paste("analysis/", prefix, ".full_megablast_table.html", sep = "")
 saveWidget(megablast_datatable, paste(getwd(),"/",prefix,"/", megablast_html_link, sep=""))
 
-blast_blastx_table$TAXID <- as.factor(blast_blastx_table$TAXID)
 blast_blastx_table <- blast_blastx_table[, table_header_order]
 blastx_datatable <- datatable(blast_blastx_table, filter = 'top', options = list(pageLength = 20, autoWidth = TRUE))
 blastx_html_link <- paste("analysis/", prefix, ".full_blastx_table.html", sep = "")
