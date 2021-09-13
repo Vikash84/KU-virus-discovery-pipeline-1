@@ -44,19 +44,21 @@ uniq_ref_species <- function(blastTable) {
 }
 
 # create parser object
-p <- arg_parser("Illumina analysis report generating program")
+p <- arg_parser("Nanopore analysis report generating program")
   
 # --- Script parameter parsing ---
 
 p <- add_argument(p, "--prefix", help="Sample prefix")
 
-p <- add_argument(p, "--multiqc_html", help="Multiqc html file path")
+p <- add_argument(p, "--nanoplot_html", help="NanoPlot html file path")
 
 p <- add_argument(p, "--mapping_summary", help="Reference mapping summary file path")
 
 p <- add_argument(p, "--classification_result_folder", help="The directory path where heatmap files exist")
 
 p <- add_argument(p, "--classification_kraken_html", help="Kraken result html file path")
+
+p <- add_argument(p, "--classification_kaiju_html", help="Kaiju result html file path")
 
 p <- add_argument(p, "--assembly_summary", help="Contigs summary file path")
 
@@ -79,11 +81,10 @@ prefix <- args$prefix
 
 # qc data
 
-
-if(is.na(args$multiqc_html)){
-  qc_link <- paste("qc/multiqc_report.html", sep="")
+if(is.na(args$nanoplot_html)){
+  qc_link <- paste("qc/", prefix, "_NanoPlot-report.html", sep="")
 } else{
-  qc_link <- args$multiqc_html
+  qc_link <- args$nanoplot_html
 }
 
 # reference mapping data
@@ -106,6 +107,12 @@ if(is.na(args$classification_kraken_html)){
   classification_kraken_link <- paste(classification_base_dir_path, "/", prefix, ".kraken.html", sep = "")
 } else{
   classification_kraken_link <- args$classification_kraken_html
+}
+
+if(is.na(args$classification_kaiju_html)){
+  classification_kaiju_link <- paste(classification_base_dir_path, "/", prefix, ".kaiju.html", sep = "")
+} else{
+  classification_kaiju_link <- args$classification_kaiju_html
 }
 
 # de novo assembly data
@@ -224,6 +231,8 @@ classification_species_heatmap <- newFigure(classification_species_heatmap_file,
 
 kraken_link <- newParagraph( asLink( "Kraken result", url=classification_kraken_link ));
 
+kaiju_link <- newParagraph( asLink( "Kaiju result", url=classification_kaiju_link ));
+
 assemble_table <- newTable( assemble_summary_table,
         "Summary statistics of assembled contigs.");
 
@@ -275,7 +284,7 @@ for ( i in 1:dim( blast_uniq_blastx_table )[1] )
 report <- addToResults( report,
 				addTo( newSubSection( "QC" ), multiqc_link ),
 				addTo( newSubSection( "Reference Mapping" ), ref_map_table ), 
-				addTo( newSubSection( "Classification heatmap" ), classification_order_heatmap, classification_family_heatmap, classification_genus_heatmap, classification_species_heatmap, kraken_link),
+				addTo( newSubSection( "Classification heatmap" ), classification_order_heatmap, classification_family_heatmap, classification_genus_heatmap, classification_species_heatmap, kraken_link, kaiju_link),
 				addTo( newSubSection( "Assembly Summary" ), assemble_table, assemble_contig_length_histogram_figure),
 				addTo( newSubSection( "Blastn Result" ), blast_table_1 ), 
 				addTo( newSubSection( "Megablast Result" ), blast_table_2 ), 
