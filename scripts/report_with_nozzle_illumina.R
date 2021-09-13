@@ -224,7 +224,7 @@ report <- setReportSubTitle( report, "A report that showcases results generated 
 
 multiqc_link <- newParagraph( asLink( "MultiQC report", url=qc_link ));
 
-if (is.na(ref_map_summary_file)) {
+if (is.na(ref_map_summary_table)) {
   ref_map_table <- newParagraph ("Not mapped to any provided reference sequence.")
 } else{
   ref_map_table <- newTable( ref_map_summary_table,
