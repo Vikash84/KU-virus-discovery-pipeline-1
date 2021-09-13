@@ -158,7 +158,7 @@ if(is.na(args$blastx_table)){
 
 
 # reference mapping data
-if(file_test(ref_map_summary_file)){
+if(file.exists(ref_map_summary_file)){
   ref_map_summary_table <- refMapFileToTable(ref_map_summary_file)
 } else{
   ref_map_summary_table <- NA
