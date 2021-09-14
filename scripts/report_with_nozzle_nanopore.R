@@ -194,17 +194,50 @@ blast_uniq_blastx_table <- uniq_ref_species(blast_blastx_table)
 table_header_order <- c("superkingdom", "phylum", "class", "order", "family", "genus", "species", "TAXID", "REF_ID", "REF_TITLE", "QUERY_ID", "REF_ID", "EVALUE", "BITSCORE", "PER_IDENT", "QUERY_LEN", "ALN_LEN", "MISMATCH", "GAPOPEN", "QSTART", "QEND", "REFSTART", "REFEND")
 
 blast_blastn_table <- blast_blastn_table[, table_header_order]
-blastn_datatable <- datatable(blast_blastn_table, filter = 'top', options = list(pageLength = 20, autoWidth = TRUE))
+blastn_datatable <- datatable(blast_blastn_table,
+                              filter = 'top', 
+                              extensions = 'Buttons', 
+                              options = list(pageLength = 20,
+                                            autoWidth = TRUE,
+                                            paging = TRUE,
+                                              searching = TRUE,
+                                              fixedColumns = TRUE,
+                                              ordering = TRUE,
+                                              dom = 'tB',
+                                              buttons = c('copy', 'csv', 'excel')),
+                              class = 'display')
 blastn_html_link <- paste("analysis/", prefix, ".full_blastn_table.html", sep = "")
 saveWidget(blastn_datatable, paste(getwd(),"/",prefix,"/",blastn_html_link, sep=""))
 
 blast_megablast_table <- blast_megablast_table[, table_header_order]
-megablast_datatable <- datatable(blast_megablast_table, filter = 'top', options = list(pageLength = 20, autoWidth = TRUE))
+megablast_datatable <- datatable(blast_megablast_table, 
+                                 filter = 'top', 
+                                 extensions = 'Buttons', 
+                                 options = list(pageLength = 20,
+                                                autoWidth = TRUE,
+                                                paging = TRUE,
+                                                 searching = TRUE,
+                                                 fixedColumns = TRUE,
+                                                 ordering = TRUE,
+                                                 dom = 'tB',
+                                                 buttons = c('copy', 'csv', 'excel')),
+                                 class = 'display')
 megablast_html_link <- paste("analysis/", prefix, ".full_megablast_table.html", sep = "")
 saveWidget(megablast_datatable, paste(getwd(),"/",prefix,"/", megablast_html_link, sep=""))
 
 blast_blastx_table <- blast_blastx_table[, table_header_order]
-blastx_datatable <- datatable(blast_blastx_table, filter = 'top', options = list(pageLength = 20, autoWidth = TRUE))
+blastx_datatable <- datatable(blast_blastx_table,
+                              filter = 'top', 
+                              extensions = 'Buttons', 
+                              options = list(pageLength = 20,
+                                            autoWidth = TRUE,
+                                            paging = TRUE,
+                                              searching = TRUE,
+                                              fixedColumns = TRUE,
+                                              ordering = TRUE,
+                                              dom = 'tB',
+                                              buttons = c('copy', 'csv', 'excel')),
+                              class = 'display')
 blastx_html_link <- paste("analysis/", prefix, ".full_blastx_table.html", sep = "")
 saveWidget(blastx_datatable, paste(getwd(),"/",prefix,"/", blastx_html_link, sep=""))
 
