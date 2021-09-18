@@ -15,6 +15,8 @@ host_dict = {
               'haemaphysalis longicornis' : host_ref_dir_path + "/GCA_010078415.1_BGI_Pant.V1_genomic.fna.gz",
               'homo sapiens' : host_ref_dir_path + "/GCF_000001405.39_GRCh38.p13_genomic.fna.gz",
               'apodemus agrarius' : host_ref_dir_path + "/NC_016428.1_Apodemus_agrarius_mitochondrion.fasta",
+              'apodemus peninsulae' : host_ref_dir_path + "/NC_016060.1_Apodemus_peninsulae_mitochondrion.fasta",
+              'apodemus chejuensis' : host_ref_dir_path + "/NC_016662.1_Apodemus_chejuensis_mitochondrion.fasta",
               'tscherskia triton' : host_ref_dir_path + "/NC_013068.1_Tscherskia_triton_mitochondrion.fasta",
               'rattus norvegicus' : host_ref_dir_path + "/GCF_015227675.2_mRatBN7.2_genomic.fna.gz"
             }
