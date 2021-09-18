@@ -182,6 +182,7 @@ process filterBlastResult_blastx {
 }
 
 process matchTaxonomyToBlastResult_blastn {
+    errorStrategy 'ignore'
     publishDir "${params.outdir}/analysis", mode: 'copy'
     conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     label "containerR"
@@ -189,7 +190,7 @@ process matchTaxonomyToBlastResult_blastn {
     input:
         path txt
     output:
-        path "${txt.simpleName}.blastn.txt"
+        path "${txt.simpleName}.blastn.txt" optional true
 
     """
     Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.blastn.txt ${params.taxonomizr_db_path}
@@ -197,6 +198,7 @@ process matchTaxonomyToBlastResult_blastn {
 }
 
 process matchTaxonomyToBlastResult_megablast {
+    errorStrategy 'ignore'
     publishDir "${params.outdir}/analysis", mode: 'copy'
     conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     label "containerR"
@@ -204,7 +206,7 @@ process matchTaxonomyToBlastResult_megablast {
     input:
         path txt
     output:
-        path "${txt.simpleName}.megablast.txt"
+        path "${txt.simpleName}.megablast.txt" optional true
 
     """
     Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.megablast.txt ${params.taxonomizr_db_path}
@@ -212,6 +214,7 @@ process matchTaxonomyToBlastResult_megablast {
 }
 
 process matchTaxonomyToBlastResult_blastx {
+    errorStrategy 'ignore'
     publishDir "${params.outdir}/analysis", mode: 'copy'
     conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     label "containerR"
@@ -219,7 +222,7 @@ process matchTaxonomyToBlastResult_blastx {
     input:
         path txt
     output:
-        path "${txt.simpleName}.blastx.txt"
+        path "${txt.simpleName}.blastx.txt" optional true
 
     """
     Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.blastx.txt ${params.taxonomizr_db_path}
