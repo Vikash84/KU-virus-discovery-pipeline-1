@@ -8,7 +8,7 @@ workflow assemble_illumina {
     main:
         spades_contigs = spades(fastq)
         contigs = spades_contigs
-        filtered_contigs = filterContigs(contigs)
+        filtered_contigs = filterContigs_illumina(contigs)
         contigSummary(filtered_contigs)
         
 }
@@ -21,10 +21,11 @@ workflow assemble_nanopore {
     main:
         megahit_contigs = megahit(filtered)
         contigs = megahit_contigs
-        contigSummary(contigs)
+        filtered_contigs = filterContigs_nanopore(contigs)
+        contigSummary(filtered_contigs)
 }
 
-process filterContigs {
+process filterContigs_illumina {
     conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     publishDir "${params.outdir}/assembly", mode: 'copy'
     label "containerBbmap"
@@ -35,6 +36,20 @@ process filterContigs {
         path("${params.prefix}.filtered_contigs.fasta")
     """
     reformat.sh in=$contigs out="${params.prefix}.filtered_contigs.fasta" minlength=${params.illumina_min_contig_length}
+    """
+}
+
+process filterContigs_nanopore {
+    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
+    publishDir "${params.outdir}/assembly", mode: 'copy'
+    label "containerBbmap"
+
+    input:
+        path contigs
+    output:
+        path("${params.prefix}.filtered_contigs.fasta")
+    """
+    reformat.sh in=$contigs out="${params.prefix}.filtered_contigs.fasta" minlength=${params.nanopore_min_contig_length}
     """
 }
 
