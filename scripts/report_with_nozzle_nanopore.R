@@ -336,8 +336,6 @@ if(file.exists(blast_blastx_file)){
     
     blast_table_3 <- addTo( blast_table_3, result1, row=i, column=1 );
   }
-} else{
-  blast_table_3 <- newTable(data.table())
 }
 
 report <- addToResults( report,
@@ -346,8 +344,12 @@ report <- addToResults( report,
 				addTo( newSubSection( "Classification heatmap" ), classification_order_heatmap, classification_family_heatmap, classification_genus_heatmap, classification_species_heatmap, kraken_link, kaiju_link),
 				addTo( newSubSection( "Assembly Summary" ), assemble_table, assemble_contig_length_histogram_figure),
 				addTo( newSubSection( "Blastn Result" ), blast_table_1 ), 
-				addTo( newSubSection( "Megablast Result" ), blast_table_2 ), 
-				addTo( newSubSection( "Blastx Result" ), blast_table_3 )); 
+				addTo( newSubSection( "Megablast Result" ), blast_table_2 ));
+
+if(file.exists(blast_blastx_file)){
+  report <- addToResults( report,
+          addTo( newSubSection( "Blastx Result" ), blast_table_3 ));
+}
 				
 # set report maintainer information
 report <- setMaintainerName( report, "Kijin Kim" );
