@@ -167,6 +167,8 @@ if(is.na(args$blastx_table)){
 # reference mapping data
 if(file.exists(ref_map_summary_file)){
   ref_map_summary_table <- refMapFileToTable(ref_map_summary_file)
+} else {
+  ref_map_summary_table <- data.table()
 }
 
 #ref_map_virus_list <- 
