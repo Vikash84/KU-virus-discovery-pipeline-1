@@ -188,8 +188,14 @@ blast_blastn_table <- blastFileToTable(blast_blastn_file)
 blast_uniq_blastn_table <- uniq_ref_species(blast_blastn_table)
 blast_megablast_table <- blastFileToTable(blast_megablast_file)
 blast_uniq_megablast_table <- uniq_ref_species(blast_megablast_table)
-blast_blastx_table <- blastFileToTable(blast_blastx_file)
-blast_uniq_blastx_table <- uniq_ref_species(blast_blastx_table)
+
+if(file.exists(blast_blastx_file)){
+  blast_blastx_table <- blastFileToTable(blast_blastx_file)
+  blast_uniq_blastx_table <- uniq_ref_species(blast_blastx_table)
+} else {
+  blast_blastx_table <- data.table()
+  blast_uniq_blastx_table <- data.table()
+}
 
 table_header_order <- c("superkingdom", "phylum", "class", "order", "family", "genus", "species", "TAXID", "REF_ID", "REF_TITLE", "QUERY_ID", "REF_ID", "EVALUE", "BITSCORE", "PER_IDENT", "QUERY_LEN", "ALN_LEN", "MISMATCH", "GAPOPEN", "QSTART", "QEND", "REFSTART", "REFEND")
 
@@ -225,22 +231,23 @@ megablast_datatable <- datatable(blast_megablast_table,
 megablast_html_link <- paste("analysis/", prefix, ".full_megablast_table.html", sep = "")
 saveWidget(megablast_datatable, paste(getwd(),"/",prefix,"/", megablast_html_link, sep=""))
 
-blast_blastx_table <- blast_blastx_table[, table_header_order]
-blastx_datatable <- datatable(blast_blastx_table,
-                              filter = 'top', 
-                              extensions = 'Buttons', 
-                              options = list(pageLength = 20,
-                                            autoWidth = TRUE,
-                                            paging = TRUE,
-                                              searching = TRUE,
-                                              fixedColumns = TRUE,
-                                              ordering = TRUE,
-                                              dom = 'tB',
-                                              buttons = c('copy', 'csv', 'excel')),
-                              class = 'display')
-blastx_html_link <- paste("analysis/", prefix, ".full_blastx_table.html", sep = "")
-saveWidget(blastx_datatable, paste(getwd(),"/",prefix,"/", blastx_html_link, sep=""))
-
+if(file.exists(blast_blastx_file)){
+  blast_blastx_table <- blast_blastx_table[, table_header_order]
+  blastx_datatable <- datatable(blast_blastx_table,
+                                filter = 'top', 
+                                extensions = 'Buttons', 
+                                options = list(pageLength = 20,
+                                              autoWidth = TRUE,
+                                              paging = TRUE,
+                                                searching = TRUE,
+                                                fixedColumns = TRUE,
+                                                ordering = TRUE,
+                                                dom = 'tB',
+                                                buttons = c('copy', 'csv', 'excel')),
+                                class = 'display')
+  blastx_html_link <- paste("analysis/", prefix, ".full_blastx_table.html", sep = "")
+  saveWidget(blastx_datatable, paste(getwd(),"/",prefix,"/", blastx_html_link, sep=""))
+}
 
 #===================================================================================================
 # Report
@@ -315,19 +322,22 @@ for ( i in 1:dim( blast_uniq_megablast_table )[1] )
   
   blast_table_2 <- addTo( blast_table_2, result1, row=i, column=1 );
 }
-
-blast_table_3 <- newTable( blast_uniq_blastx_table,
-                           "blastx result", file=blastx_html_link);
-	
-for ( i in 1:dim( blast_uniq_blastx_table )[1] )
-{
-  subtable_with_ref <- subset(blast_blastx_table, species == blast_uniq_blastx_table[i,"REF_SPECIES"])
-  subtable_with_ref <- subtable_with_ref[c("QUERY_ID", "REF_ID", "PER_IDENT", "QUERY_LEN", "ALN_LEN",	"REFSTART", "REFEND", "EVALUE", "BITSCORE")]
-  subtable_with_ref$REF_ID <- as.character(subtable_with_ref$REF_ID)
-  result1 <- addTo( newResult( ""),
-                    addTo( newSection( "Contigs assigned to ", blast_uniq_blastx_table[i,2] ), newTable(subtable_with_ref) ) );
-  
-  blast_table_3 <- addTo( blast_table_3, result1, row=i, column=1 );
+if(file.exists(blast_blastx_file)){
+  blast_table_3 <- newTable( blast_uniq_blastx_table,
+                            "blastx result", file=blastx_html_link);
+    
+  for ( i in 1:dim( blast_uniq_blastx_table )[1] )
+  {
+    subtable_with_ref <- subset(blast_blastx_table, species == blast_uniq_blastx_table[i,"REF_SPECIES"])
+    subtable_with_ref <- subtable_with_ref[c("QUERY_ID", "REF_ID", "PER_IDENT", "QUERY_LEN", "ALN_LEN",	"REFSTART", "REFEND", "EVALUE", "BITSCORE")]
+    subtable_with_ref$REF_ID <- as.character(subtable_with_ref$REF_ID)
+    result1 <- addTo( newResult( ""),
+                      addTo( newSection( "Contigs assigned to ", blast_uniq_blastx_table[i,2] ), newTable(subtable_with_ref) ) );
+    
+    blast_table_3 <- addTo( blast_table_3, result1, row=i, column=1 );
+  }
+} else{
+  blast_table_3 <- newTable(data.table())
 }
 
 report <- addToResults( report,
