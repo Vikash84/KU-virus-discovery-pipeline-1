@@ -272,7 +272,7 @@ report <- setReportSubTitle( report, "A report that showcases results generated 
 
 nanoplot_link <- newParagraph( asLink( "NanoPlot report", url=qc_link ));
 
-if(file.exists(ref_map_summary_file)){
+if(nrow(ref_map_summary_table) > 0){
   ref_map_table <- newTable( ref_map_summary_table,
 				"Reference mapping summary. Column follows bamcov format.");
 } else{
