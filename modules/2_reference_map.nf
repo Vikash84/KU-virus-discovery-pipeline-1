@@ -34,7 +34,7 @@ workflow reference_map_nanopore {
         map_info = mapping_summary(bams)
         collection = map_info[0].collectFile(name: "${params.prefix}_temp_colleciton.txt")
         summary_collection = add_header(collection)
-        filter(summary_collection)
+//        filter(summary_collection)
 }
 
 process split_fastq_tuple {
@@ -116,6 +116,7 @@ process filter {
 }
 
 process add_header {
+    publishDir "${params.outdir}/mapping", mode: 'copy'
 
     input:
         path collection
