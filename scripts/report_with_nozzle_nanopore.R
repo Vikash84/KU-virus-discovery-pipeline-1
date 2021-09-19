@@ -167,8 +167,6 @@ if(is.na(args$blastx_table)){
 # reference mapping data
 if(file.exists(ref_map_summary_file)){
   ref_map_summary_table <- refMapFileToTable(ref_map_summary_file)
-} else{
-  ref_map_summary_table <- NA
 }
 
 #ref_map_virus_list <- 
@@ -186,15 +184,16 @@ assemble_summary_table <- AssembleSummaryFileToTable(assemble_summary_file)
 
 blast_blastn_table <- blastFileToTable(blast_blastn_file)
 blast_uniq_blastn_table <- uniq_ref_species(blast_blastn_table)
-blast_megablast_table <- blastFileToTable(blast_megablast_file)
-blast_uniq_megablast_table <- uniq_ref_species(blast_megablast_table)
+
+if(file.exists(blast_megablast_file)){
+  blast_megablast_table <- blastFileToTable(blast_megablast_file)
+  blast_uniq_megablast_table <- uniq_ref_species(blast_megablast_table)
+}
+
 
 if(file.exists(blast_blastx_file)){
   blast_blastx_table <- blastFileToTable(blast_blastx_file)
   blast_uniq_blastx_table <- uniq_ref_species(blast_blastx_table)
-} else {
-  blast_blastx_table <- data.table()
-  blast_uniq_blastx_table <- data.table()
 }
 
 table_header_order <- c("superkingdom", "phylum", "class", "order", "family", "genus", "species", "TAXID", "REF_ID", "REF_TITLE", "QUERY_ID", "REF_ID", "EVALUE", "BITSCORE", "PER_IDENT", "QUERY_LEN", "ALN_LEN", "MISMATCH", "GAPOPEN", "QSTART", "QEND", "REFSTART", "REFEND")
@@ -215,22 +214,23 @@ blastn_datatable <- datatable(blast_blastn_table,
 blastn_html_link <- paste("analysis/", prefix, ".full_blastn_table.html", sep = "")
 saveWidget(blastn_datatable, paste(getwd(),"/",prefix,"/",blastn_html_link, sep=""))
 
-blast_megablast_table <- blast_megablast_table[, table_header_order]
-megablast_datatable <- datatable(blast_megablast_table, 
-                                 filter = 'top', 
-                                 extensions = 'Buttons', 
-                                 options = list(pageLength = 20,
-                                                autoWidth = TRUE,
-                                                paging = TRUE,
-                                                 searching = TRUE,
-                                                 fixedColumns = TRUE,
-                                                 ordering = TRUE,
-                                                 dom = 'tB',
-                                                 buttons = c('copy', 'csv', 'excel')),
-                                 class = 'display')
-megablast_html_link <- paste("analysis/", prefix, ".full_megablast_table.html", sep = "")
-saveWidget(megablast_datatable, paste(getwd(),"/",prefix,"/", megablast_html_link, sep=""))
-
+if(file.exists(blast_megablast_file)){
+  blast_megablast_table <- blast_megablast_table[, table_header_order]
+  megablast_datatable <- datatable(blast_megablast_table, 
+                                  filter = 'top', 
+                                  extensions = 'Buttons', 
+                                  options = list(pageLength = 20,
+                                                  autoWidth = TRUE,
+                                                  paging = TRUE,
+                                                  searching = TRUE,
+                                                  fixedColumns = TRUE,
+                                                  ordering = TRUE,
+                                                  dom = 'tB',
+                                                  buttons = c('copy', 'csv', 'excel')),
+                                  class = 'display')
+  megablast_html_link <- paste("analysis/", prefix, ".full_megablast_table.html", sep = "")
+  saveWidget(megablast_datatable, paste(getwd(),"/",prefix,"/", megablast_html_link, sep=""))
+}
 if(file.exists(blast_blastx_file)){
   blast_blastx_table <- blast_blastx_table[, table_header_order]
   blastx_datatable <- datatable(blast_blastx_table,
@@ -272,11 +272,11 @@ report <- setReportSubTitle( report, "A report that showcases results generated 
 
 nanoplot_link <- newParagraph( asLink( "NanoPlot report", url=qc_link ));
 
-if (is.na(ref_map_summary_table)) {
-  ref_map_table <- newParagraph ("Not mapped to any provided reference sequence.")
-} else{
+if(file.exists(ref_map_summary_file)){
   ref_map_table <- newTable( ref_map_summary_table,
 				"Reference mapping summary. Column follows bamcov format.");
+} else{
+  ref_map_table <- newParagraph ("Not mapped to any provided reference sequence.")
 }
 
 
@@ -308,19 +308,20 @@ for ( i in 1:dim( blast_uniq_blastn_table )[1] )
 
   blast_table_1 <- addTo( blast_table_1, result1, row=i, column=1 );
 }
+if(file.exists(blast_megablast_file)){
+  blast_table_2 <- newTable( blast_uniq_megablast_table,
+                            "megablast result", file=megablast_html_link);
 
-blast_table_2 <- newTable( blast_uniq_megablast_table,
-                           "megablast result", file=megablast_html_link);
-
-for ( i in 1:dim( blast_uniq_megablast_table )[1] )
-{
-  subtable_with_ref <- subset(blast_megablast_table, species == blast_uniq_megablast_table[i,"REF_SPECIES"])
-  subtable_with_ref <- subtable_with_ref[c("QUERY_ID", "REF_ID", "PER_IDENT", "QUERY_LEN", "ALN_LEN",	"REFSTART", "REFEND", "EVALUE", "BITSCORE")]
-  subtable_with_ref$REF_ID <- as.character(subtable_with_ref$REF_ID)
-  result1 <- addTo( newResult( ""),
-                    addTo( newSection( "Contigs assigned to ", blast_uniq_megablast_table[i,2] ), newTable(subtable_with_ref) ) );
-  
-  blast_table_2 <- addTo( blast_table_2, result1, row=i, column=1 );
+  for ( i in 1:dim( blast_uniq_megablast_table )[1] )
+  {
+    subtable_with_ref <- subset(blast_megablast_table, species == blast_uniq_megablast_table[i,"REF_SPECIES"])
+    subtable_with_ref <- subtable_with_ref[c("QUERY_ID", "REF_ID", "PER_IDENT", "QUERY_LEN", "ALN_LEN",	"REFSTART", "REFEND", "EVALUE", "BITSCORE")]
+    subtable_with_ref$REF_ID <- as.character(subtable_with_ref$REF_ID)
+    result1 <- addTo( newResult( ""),
+                      addTo( newSection( "Contigs assigned to ", blast_uniq_megablast_table[i,2] ), newTable(subtable_with_ref) ) );
+    
+    blast_table_2 <- addTo( blast_table_2, result1, row=i, column=1 );
+  }
 }
 if(file.exists(blast_blastx_file)){
   blast_table_3 <- newTable( blast_uniq_blastx_table,
@@ -343,9 +344,12 @@ report <- addToResults( report,
 				addTo( newSubSection( "Reference Mapping" ), ref_map_table ), 
 				addTo( newSubSection( "Classification heatmap" ), classification_order_heatmap, classification_family_heatmap, classification_genus_heatmap, classification_species_heatmap, kraken_link, kaiju_link),
 				addTo( newSubSection( "Assembly Summary" ), assemble_table, assemble_contig_length_histogram_figure),
-				addTo( newSubSection( "Blastn Result" ), blast_table_1 ), 
-				addTo( newSubSection( "Megablast Result" ), blast_table_2 ));
+				addTo( newSubSection( "Blastn Result" ), blast_table_1 )); 
 
+if(file.exists(blast_megablast_file)){
+  report <- addToResults( report,
+      addTo( newSubSection( "Megablast Result" ), blast_table_2 ));
+}
 if(file.exists(blast_blastx_file)){
   report <- addToResults( report,
           addTo( newSubSection( "Blastx Result" ), blast_table_3 ));
