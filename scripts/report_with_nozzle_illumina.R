@@ -134,19 +134,19 @@ if(is.na(args$assembly_length_histogram)){
 # blast data
 
 if(is.na(args$blastn_table)){
-  blast_blastn_file <- paste(prefix, "/analysis/", prefix, ".blastn.txt", sep="")
+  blast_blastn_file <- paste(prefix, "/analysis/", prefix, ".blastn.viruses.txt", sep="")
 } else{
   blast_blastn_file <- args$blastn_table
 }
 
 if(is.na(args$megablast_table)){
-  blast_megablast_file <- paste(prefix, "/analysis/", prefix, ".megablast.txt", sep="")
+  blast_megablast_file <- paste(prefix, "/analysis/", prefix, ".megablast.viruses.txt", sep="")
 } else{
   blast_megablast_file <- args$megablast_table
 }
 
 if(is.na(args$blastx_table)){
-  blast_blastx_file <- paste(prefix, "/analysis/", prefix, ".blastx.txt", sep="")
+  blast_blastx_file <- paste(prefix, "/analysis/", prefix, ".blastx.viruses.txt", sep="")
 } else{
   blast_blastx_file <- args$blastx_table
 }
