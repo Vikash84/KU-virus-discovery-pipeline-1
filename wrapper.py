@@ -6,9 +6,10 @@ from difflib import SequenceMatcher
 import warnings
 
 nextflow_path="/home/molecularvirology/miniconda2/envs/vdp_lrs/bin/"
+host_ref_dir_path = "/media/molecularvirology/b6d973a5-06b6-4aae-9d77-bf28064b405e/Kijin/host_reference"
+
 nextflow_script_path=os.path.dirname(os.path.realpath(__file__))+"/"
 
-host_ref_dir_path = "/media/molecularvirology/b6d973a5-06b6-4aae-9d77-bf28064b405e/Kijin/host_reference"
 host_dict = { 
               'rhinolophus ferrumequinum' : host_ref_dir_path + "/GCF_004115265.1_mRhiFer1_v1.p_genomic.fna.gz",
               'pygoscelis antarctica' : host_ref_dir_path + "/GCA_010078415.1_BGI_Pant.V1_genomic.fna.gz",

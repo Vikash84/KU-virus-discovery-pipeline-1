@@ -149,7 +149,7 @@ process filterBlastResult_blastn {
         path "${txt.baseName}.filtered.tmp"
 
     """
-    python ${params.pipeline_directory}/scripts/blast_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --exclude ${params.exclude_keyword_file} --aln_len 100 --aln_contig_len_prop 0.5
+    python ${params.pipeline_directory}/scripts/5_blast_result_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --exclude ${params.exclude_keyword_file} --aln_len 100 --aln_contig_len_prop 0.5
     """
 }
 
@@ -163,7 +163,7 @@ process filterBlastResult_megablast {
         path "${txt.baseName}.filtered.tmp"
 
     """
-    python ${params.pipeline_directory}/scripts/blast_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --exclude ${params.exclude_keyword_file} --aln_len 100 --aln_contig_len_prop 0.5
+    python ${params.pipeline_directory}/scripts/5_blast_result_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --exclude ${params.exclude_keyword_file} --aln_len 100 --aln_contig_len_prop 0.5
     """
 }
 
@@ -177,7 +177,7 @@ process filterBlastResult_blastx {
         path "${txt.baseName}.filtered.tmp"
 
     """
-    python ${params.pipeline_directory}/scripts/blast_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --exclude ${params.exclude_keyword_file} --aln_len 33 --aln_contig_len_prop 0.17
+    python ${params.pipeline_directory}/scripts/5_blast_result_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --exclude ${params.exclude_keyword_file} --aln_len 33 --aln_contig_len_prop 0.17
     """
 }
 
@@ -193,7 +193,7 @@ process matchTaxonomyToBlastResult_blastn {
         path "${txt.simpleName}.blastn.txt" optional true
 
     """
-    Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.blastn.txt ${params.taxonomizr_db_path}
+    Rscript ${params.pipeline_directory}/scripts/5_match_taxonomy_to_blast_result.R $txt ${txt.simpleName}.blastn.txt ${params.taxonomizr_db_path}
     """
 }
 

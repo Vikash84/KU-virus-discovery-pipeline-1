@@ -34,7 +34,7 @@ process kreport2EDGEform {
         path "${params.prefix}.list"
 
     """
-    perl ${params.pipeline_directory}/scripts/convert_krakenRep2list.pl < $kraken_report > ${params.prefix}.list
+    perl ${params.pipeline_directory}/scripts/3_convert_krakenRep2list.pl < $kraken_report > ${params.prefix}.list
     """
 }
 
@@ -51,7 +51,7 @@ process EDGEform2heatmap {
         path "${params.prefix}_genus.svg"
         path "${params.prefix}_species.svg"
     """
-    Rscript ${params.pipeline_directory}/scripts/make_heatmap_with_metacomp.R ${edge_form} ${params.prefix}
+    Rscript ${params.pipeline_directory}/scripts/3_generate_heatmap.R ${edge_form} ${params.prefix}
     """
 }
 

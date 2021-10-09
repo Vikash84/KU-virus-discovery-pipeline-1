@@ -111,7 +111,7 @@ process filter {
         path "${params.prefix}.filtered_reference_mapping_collection.txt"
     
     """
-    python ${params.pipeline_directory}/scripts/reference_filter.py --input $collection --output ${params.prefix}.filtered_reference_mapping_collection.txt --min_avg_cov 1.0
+    python ${params.pipeline_directory}/scripts/2_reference_map_result_filter.py --input $collection --output ${params.prefix}.filtered_reference_mapping_collection.txt --min_avg_cov 1.0
     """
 }
 
