@@ -8,13 +8,13 @@ workflow analyze_contigs {
         blastn_aln = blastn_results[0]
         megablast_aln = blastn_results[1]
 
-        makeHtmlFromBlastAln_1(blastn_aln)
+        //makeHtmlFromBlastAln_1(blastn_aln)
         blastn_tmp = makeTxtFromBlastAln_1(blastn_aln)
         blastn_txt = add_header_1(blastn_tmp)
         blastn_filtered = filterBlastResult_blastn(blastn_txt)
         matchTaxonomyToBlastResult_blastn(blastn_filtered)
 
-        makeHtmlFromBlastAln_2(megablast_aln)
+        //makeHtmlFromBlastAln_2(megablast_aln)
         megablast_tmp = makeTxtFromBlastAln_2(megablast_aln)
         megablast_txt = add_header_2(megablast_tmp)
         megablast_filtered = filterBlastResult_megablast(megablast_txt)

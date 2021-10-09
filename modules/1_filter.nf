@@ -64,7 +64,7 @@ process deduplication {
 }
 
 process trimmomatic {
-    label "containerPython"
+    label "containerTrimmomatic"
     conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     input:
         tuple path(pe1), path(pe2)
