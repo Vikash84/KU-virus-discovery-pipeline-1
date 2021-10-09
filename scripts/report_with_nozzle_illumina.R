@@ -24,7 +24,7 @@ AssembleSummaryFileToTable <- function(text_file) {
 }
 
 blastFileToTable <- function(text_file) {
-  ret <- read.table(text_file, header = TRUE, sep = "\t", strip.white = TRUE, quote="")
+  ret <- read.table(text_file, header = TRUE, sep = "\t", strip.white = TRUE, quote="", fill=TRUE)
   ret$BITSCORE <- as.integer(ret$BITSCORE)
   ret$TAXID <- as.factor(ret$TAXID)
   ret$superkingdom <- as.factor(ret$superkingdom)
