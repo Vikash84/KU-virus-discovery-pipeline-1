@@ -129,6 +129,7 @@ process hostfilter_nanopore {
 
     label "containerHostfilter"
     conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
+    publishDir "${params.outdir}/filter", mode: 'copy'
     
     input:
         path fastq

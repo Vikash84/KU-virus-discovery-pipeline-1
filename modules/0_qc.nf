@@ -19,6 +19,13 @@ workflow qc_nanopore {
         nanoplot(fastq)
 }
 
+workflow qc_nanopore_filtered {
+    take:
+        filtered
+    main:
+        nanoplot_filtered(filtered)
+}
+
 process fastqc1 {
     label "containerFastQC"
     conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
@@ -68,5 +75,19 @@ process nanoplot {
     """
     NanoPlot --fastq $fastq -p ${params.prefix}_ -o ${params.prefix}
     mv ${params.prefix}/* .
+    """
+}
+
+process nanoplot_filtered {
+    label "containerPython"
+    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
+    publishDir "${params.outdir}/qc", mode: 'copy'
+    input:
+        path fastq
+    output:
+        path "${params.prefix}_filtered_*"
+    """
+    NanoPlot --fastq $fastq -p ${params.prefix}_filtered_ -o ${params.prefix}_filtered
+    mv ${params.prefix}_filtered/* .
     """
 }

@@ -1,5 +1,5 @@
 nextflow.enable.dsl=2
-include { qc_nanopore } from './modules/0_qc'
+include { qc_nanopore; qc_nanopore_filtered } from './modules/0_qc'
 include { filter_nanopore } from './modules/1_filter'
 include { reference_map_nanopore } from './modules/2_reference_map'
 include { classify_reads_nanopore } from './modules/3_classify_reads'
@@ -33,19 +33,20 @@ workflow {
 
         // filter too short/low quality and host-derived reads
         filtered = filter_nanopore(fastq)
+        qc_nanopore_filtered(filtered)
 
         // reference mapping with provided virus sequence lists
         reference_map_nanopore(filtered)
 
         // read taxon classification
-        classify_reads_nanopore(filtered)
+//        classify_reads_nanopore(filtered)
 
         // de novo assembly
-        contigs = assemble_nanopore(filtered)
+//        contigs = assemble_nanopore(filtered)
 
         // post-assembly work
-        polished_contigs = polish(contigs, fastq)
+//        polished_contigs = polish(contigs, fastq)
 
         // contigs homology search and functional analysis
-        analyze_contigs(polished_contigs)
+//        analyze_contigs(polished_contigs)
 }
