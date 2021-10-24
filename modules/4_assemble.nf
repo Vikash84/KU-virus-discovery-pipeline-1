@@ -26,9 +26,7 @@ workflow assemble_nanopore {
 }
 
 process filterContigs_illumina {
-    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     publishDir "${params.outdir}/assembly", mode: 'copy'
-    label "containerBbmap"
 
     input:
         path contigs
@@ -40,9 +38,7 @@ process filterContigs_illumina {
 }
 
 process filterContigs_nanopore {
-    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     publishDir "${params.outdir}/assembly", mode: 'copy'
-    label "containerBbmap"
 
     input:
         path contigs
@@ -55,21 +51,18 @@ process filterContigs_nanopore {
 
 process contigSummary {
     publishDir "${params.outdir}/assembly", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     input:
         path contigs
     output:
         path "${params.prefix}.contig_summary.txt"
         path "${params.prefix}.contigs_length_histogram.png"
     """
-    python ${params.pipeline_directory}/scripts/4_contig_summary_statistics.py $params.prefix $contigs
+    python ~/scripts/4_contig_summary_statistics.py $params.prefix $contigs
     """
 }
 
 process spades{
     errorStrategy { 'ignore' }
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerSpades"
     input:
         tuple path(pe1), path(pe2)
     output:
@@ -85,9 +78,7 @@ process spades{
 
 process megahit {
     errorStrategy { 'ignore' }
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     publishDir "${params.outdir}/assembly", mode: 'copy'
-    label "containerMegahit"
     input:
         path fastq
     output:

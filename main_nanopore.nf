@@ -36,7 +36,7 @@ workflow {
         qc_nanopore_filtered(filtered)
 
         // reference mapping with provided virus sequence lists
-        reference_map_nanopore(filtered)
+//        reference_map_nanopore(filtered)
 
         // read taxon classification
 //        classify_reads_nanopore(filtered)

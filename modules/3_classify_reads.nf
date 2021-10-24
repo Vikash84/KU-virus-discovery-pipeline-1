@@ -8,8 +8,6 @@ workflow classify_reads_illumina {
         kreport2krona(kraken_result)
         edge_form = kreport2EDGEform(kraken_result)
         EDGEform2heatmap(edge_form)
-        //kaiju_results = kaiju_illumina(filtered)
-        //kaiju2krona(kaiju_results)
 }
 
 workflow classify_reads_nanopore {
@@ -25,8 +23,6 @@ workflow classify_reads_nanopore {
 }
 
 process kreport2EDGEform {
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerKrona"
 
     input:
         path kraken_report
@@ -34,14 +30,12 @@ process kreport2EDGEform {
         path "${params.prefix}.list"
 
     """
-    perl ${params.pipeline_directory}/scripts/3_convert_krakenRep2list.pl < $kraken_report > ${params.prefix}.list
+    perl ~/scripts/3_convert_krakenRep2list.pl < $kraken_report > ${params.prefix}.list
     """
 }
 
 process EDGEform2heatmap {
     publishDir "${params.outdir}/classification", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
-    label "containerMetaComp"
 
     input:
         path edge_form
@@ -51,13 +45,11 @@ process EDGEform2heatmap {
         path "${params.prefix}_genus.svg"
         path "${params.prefix}_species.svg"
     """
-    Rscript ${params.pipeline_directory}/scripts/3_generate_heatmap.R ${edge_form} ${params.prefix}
+    Rscript ~/scripts/3_generate_heatmap.R ${edge_form} ${params.prefix}
     """
 }
 
 process kraken2_illumina {
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerKraken"
     input:
         tuple path(pe1), path(pe2)
     output:
@@ -76,8 +68,6 @@ process kraken2_illumina {
 }
 
 process kraken2_nanopore {
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerKraken"
     input:
         path fastq
     output:
@@ -95,8 +85,6 @@ process kraken2_nanopore {
 
 process kreport2krona {
     publishDir "${params.outdir}/classification", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerKrona"
     input:
         path kraken_report
     output:
@@ -111,8 +99,6 @@ process kreport2krona {
 
 process kaiju_nanopore {
     publishDir "${params.outdir}/classification", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerKaiju"
     input:
         path fastq
     output:
@@ -134,8 +120,6 @@ process kaiju_nanopore {
 
 process kaiju2krona {
     publishDir "${params.outdir}/classification", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerKrona"
     input:
         path kaiju_krona
     output:
@@ -150,8 +134,6 @@ process kaiju2krona {
 process bracken {
     errorStrategy 'ignore'
     publishDir "${params.outdir}/classification", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerBracken"
     input:
         path kraken_report
     output:

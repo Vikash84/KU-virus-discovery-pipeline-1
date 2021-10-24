@@ -4,12 +4,10 @@ nextflow.enable.dsl=2
 workflow reference_map_illumina {
     take:
         fastq
-
     main:
-        Channel.fromPath(params.reference_vir_file_list_path)
-            .splitText().map { it -> it.trim() }
-            .map { file(it) }
-            .set { references }
+        references = Channel.fromPath(params.ref_vir_list)
+                            .splitText()
+                            .map{file(it)}
 
         fastq_pair = split_fastq_tuple(fastq)
         bams = each_ref_mapping_illumina(fastq_pair[0].first(), fastq_pair[1].first(), references).filter{it.size()>1000}
@@ -22,9 +20,10 @@ workflow reference_map_illumina {
 workflow reference_map_nanopore {
     take:
         filtered
+        ref_list
 
     main:
-        Channel.fromPath(params.reference_vir_file_list_path)
+        Channel.fromPath(ref_list)
             .splitText().map { it -> it.trim() }
             .map { file(it) }
             .set { references }
@@ -35,6 +34,15 @@ workflow reference_map_nanopore {
         collection = map_info[0].collectFile(name: "${params.prefix}_temp_colleciton.txt")
         summary_collection = add_header(collection)
         filter(summary_collection)
+}
+
+process generate_ref_vir_channel {
+    input:
+        tuple path(pe1), path(pe2)
+    output:
+        Channel.fromPath('/tmp/Viral_sequences_DB/*/*fas')
+    """
+    """
 }
 
 process split_fastq_tuple {
@@ -51,8 +59,6 @@ process split_fastq_tuple {
 
 process each_ref_mapping_illumina {
     errorStrategy 'ignore'
-    label "containerBowtie2"
-    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     stageInMode "link"
 
     input:
@@ -69,8 +75,6 @@ process each_ref_mapping_illumina {
 }
 
 process each_ref_mapping_nanopore {
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerMinimap"
 
     input:
         tuple path(fastq), path(ref_fa)
@@ -84,7 +88,6 @@ process each_ref_mapping_nanopore {
 
 process mapping_summary {
     errorStrategy 'ignore'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     stageInMode 'link'
 
     input:
@@ -94,7 +97,7 @@ process mapping_summary {
         path "${bam.simpleName}.png" optional true
     """
     mkdir each_mapping
-    ${params.bamcov_path}/bamcov -H $bam > each_mapping/"${bam.simpleName}.txt"
+    ~/bamcov -H $bam > each_mapping/"${bam.simpleName}.txt"
     qualimap bamqc -bam $bam -outdir qualimap_results
     mv qualimap_results/images_qualimapReport/genome_coverage_across_reference.png "${bam.simpleName}.png"
     """
@@ -102,8 +105,6 @@ process mapping_summary {
 
 process filter {
     publishDir "${params.outdir}/mapping", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerPython"
 
     input:
         path collection
@@ -111,7 +112,7 @@ process filter {
         path "${params.prefix}.filtered_reference_mapping_collection.txt"
     
     """
-    python ${params.pipeline_directory}/scripts/2_reference_map_result_filter.py --input $collection --output ${params.prefix}.filtered_reference_mapping_collection.txt --min_avg_cov 1.0
+    python ~/scripts/2_reference_map_result_filter.py --input $collection --output ${params.prefix}.filtered_reference_mapping_collection.txt --min_avg_cov 1.0
     """
 }
 
@@ -123,6 +124,6 @@ process add_header {
     output:
         path "${params.prefix}.reference_mapping_summary.txt"
     """
-    cat ${params.pipeline_directory}/headers/bamcov_header $collection > ${params.prefix}.reference_mapping_summary.txt
+    cat ~/headers/bamcov_header $collection > ${params.prefix}.reference_mapping_summary.txt
     """
 }

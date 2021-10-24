@@ -22,7 +22,6 @@ workflow filter_nanopore {
         filtered
     main:
         filtered = nanofilt(fastq)
-        
         if ( params.host )
             filtered = hostfilter_nanopore(filtered)
 }
@@ -50,8 +49,6 @@ process decompress_fastq {
 }
 
 process deduplication {
-    label "containerPrinSeq"
-    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
 
     input:
         tuple path(pe1), path(pe2)
@@ -64,8 +61,6 @@ process deduplication {
 }
 
 process trimmomatic {
-    label "containerTrimmomatic"
-    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
     input:
         tuple path(pe1), path(pe2)
     output:
@@ -84,8 +79,6 @@ process trimmomatic {
 }
 
 process nanofilt {
-    label "containerPython"
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     input:
         path fastq
     output:
@@ -96,8 +89,7 @@ process nanofilt {
     echo "Filter low quality reads"
     echo "sample name: ${params.prefix}"
     echo "input file: $fastq"
-    
-    NanoFilt --length 300 --quality 9 --readtype 1D $fastq > ${params.prefix}.filtered.fastq
+    NanoFilt --length 200 --readtype 1D $fastq > ${params.prefix}.filtered.fastq
 
     """
 }
@@ -105,8 +97,6 @@ process nanofilt {
 process hostfilter_illumina {
 //    errorStrategy { 'ignore' }
 
-    label "containerBowtie2"
-    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
 
     input:
         tuple path(pe1), path(pe2)
@@ -127,8 +117,6 @@ process hostfilter_illumina {
 process hostfilter_nanopore {
 //    errorStrategy { 'ignore' }
 
-    label "containerHostfilter"
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
     publishDir "${params.outdir}/filter", mode: 'copy'
     
     input:

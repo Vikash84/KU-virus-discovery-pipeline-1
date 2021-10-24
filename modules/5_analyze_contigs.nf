@@ -8,13 +8,11 @@ workflow analyze_contigs {
         blastn_aln = blastn_results[0]
         megablast_aln = blastn_results[1]
 
-        //makeHtmlFromBlastAln_1(blastn_aln)
         blastn_tmp = makeTxtFromBlastAln_1(blastn_aln)
         blastn_txt = add_header_1(blastn_tmp)
         blastn_filtered = filterBlastResult_blastn(blastn_txt)
         matchTaxonomyToBlastResult_blastn(blastn_filtered)
 
-        //makeHtmlFromBlastAln_2(megablast_aln)
         megablast_tmp = makeTxtFromBlastAln_2(megablast_aln)
         megablast_txt = add_header_2(megablast_tmp)
         megablast_filtered = filterBlastResult_megablast(megablast_txt)
@@ -27,8 +25,6 @@ workflow analyze_contigs {
 }
 
 process blastn {
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerBlast"
     
     input:
         path contigs
@@ -43,8 +39,6 @@ process blastn {
 }
 
 process diamondBlastx {
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerDiamond"
 
     input:
         path contigs
@@ -55,37 +49,7 @@ process diamondBlastx {
     """
 }
 
-process makeHtmlFromBlastAln_1 {
-    publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerBlast"
-
-    input:
-        path aln
-    output:
-        path "${aln.baseName}.html"
-    """
-    blast_formatter -archive $aln -html > ${aln.baseName}.html
-    """
-}
-
-process makeHtmlFromBlastAln_2 {
-    publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerBlast"
-
-    input:
-        path aln
-    output:
-        path "${aln.baseName}.html"
-    """
-    blast_formatter -archive $aln -html > ${aln.baseName}.html
-    """
-}
-
 process makeTxtFromBlastAln_1 {
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerBlast"
 
     input:
         path aln
@@ -97,8 +61,6 @@ process makeTxtFromBlastAln_1 {
 }
 
 process makeTxtFromBlastAln_2 {
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerBlast"
 
     input:
         path aln
@@ -115,7 +77,7 @@ process add_header_1 {
     output:
         path "${tmp.baseName}.headered.tmp"
     """
-    cat ${params.pipeline_directory}/headers/blast_header $tmp > ${tmp.baseName}.headered.tmp
+    cat ~/headers/blast_header $tmp > ${tmp.baseName}.headered.tmp
     """
 }
 
@@ -125,7 +87,7 @@ process add_header_2 {
     output:
         path "${tmp.baseName}.headered.tmp"
     """
-    cat ${params.pipeline_directory}/headers/blast_header $tmp > ${tmp.baseName}.headered.tmp
+    cat ~/headers/blast_header $tmp > ${tmp.baseName}.headered.tmp
     """
 }
 
@@ -135,13 +97,11 @@ process add_header_3 {
     output:
         path "${tmp.baseName}.headered.tmp"
     """
-    cat ${params.pipeline_directory}/headers/blast_header $tmp > ${tmp.baseName}.headered.tmp
+    cat ~/headers/blast_header $tmp > ${tmp.baseName}.headered.tmp
     """
 }
 
 process filterBlastResult_blastn {
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerPython"
 
     input:
         path txt
@@ -149,13 +109,11 @@ process filterBlastResult_blastn {
         path "${txt.baseName}.filtered.tmp"
 
     """
-    python ${params.pipeline_directory}/scripts/5_blast_result_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --exclude ${params.exclude_keyword_file} --aln_len 100 --aln_contig_len_prop 0.5
+    python ~/scripts/5_blast_result_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --aln_len 100 --aln_contig_len_prop 0.5
     """
 }
 
 process filterBlastResult_megablast {
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerPython"
 
     input:
         path txt
@@ -163,13 +121,11 @@ process filterBlastResult_megablast {
         path "${txt.baseName}.filtered.tmp"
 
     """
-    python ${params.pipeline_directory}/scripts/5_blast_result_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --exclude ${params.exclude_keyword_file} --aln_len 100 --aln_contig_len_prop 0.5
+    python ~/scripts/5_blast_result_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --aln_len 100 --aln_contig_len_prop 0.5
     """
 }
 
 process filterBlastResult_blastx {
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerPython"
 
     input:
         path txt
@@ -177,15 +133,13 @@ process filterBlastResult_blastx {
         path "${txt.baseName}.filtered.tmp"
 
     """
-    python ${params.pipeline_directory}/scripts/5_blast_result_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --exclude ${params.exclude_keyword_file} --aln_len 33 --aln_contig_len_prop 0.17
+    python ~/scripts/5_blast_result_filter.py --input $txt --output ${txt.baseName}.filtered.tmp --aln_len 33 --aln_contig_len_prop 0.17
     """
 }
 
 process matchTaxonomyToBlastResult_blastn {
     errorStrategy 'ignore'
     publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
-    label "containerR"
 
     input:
         path txt
@@ -193,15 +147,13 @@ process matchTaxonomyToBlastResult_blastn {
         path "${txt.simpleName}.blastn.txt" optional true
 
     """
-    Rscript ${params.pipeline_directory}/scripts/5_match_taxonomy_to_blast_result.R $txt ${txt.simpleName}.blastn.txt ${params.taxonomizr_db_path}
+    Rscript ~/scripts/5_match_taxonomy_to_blast_result.R $txt ${txt.simpleName}.blastn.txt ${params.taxonomizr_db_path}
     """
 }
 
 process matchTaxonomyToBlastResult_megablast {
     errorStrategy 'ignore'
     publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
-    label "containerR"
 
     input:
         path txt
@@ -209,15 +161,13 @@ process matchTaxonomyToBlastResult_megablast {
         path "${txt.simpleName}.megablast.txt" optional true
 
     """
-    Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.megablast.txt ${params.taxonomizr_db_path}
+    Rscript ~/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.megablast.txt ${params.taxonomizr_db_path}
     """
 }
 
 process matchTaxonomyToBlastResult_blastx {
     errorStrategy 'ignore'
     publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_srs"
-    label "containerR"
 
     input:
         path txt
@@ -225,54 +175,7 @@ process matchTaxonomyToBlastResult_blastx {
         path "${txt.simpleName}.blastx.txt" optional true
 
     """
-    Rscript ${params.pipeline_directory}/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.blastx.txt ${params.taxonomizr_db_path}
+    Rscript ~/scripts/match_taxonomy_to_blast.R $txt ${txt.simpleName}.blastx.txt ${params.taxonomizr_db_path}
     """
 }
 
-process vibrant {
-    publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerVibrant"
-
-    input:
-        path contigs
-    output:
-        path "VIBRANT/**VIBRANT_summary_results_*" optional true
-    """
-    VIBRANT_run.py -i $contigs -folder VIBRANT -d ${params.vibrant_db_path} -m ${params.vibrant_files_path}
-    """
-}
-
-process deepvirfinder {
-    errorStrategy 'ignore'
-    publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerDVF"
-
-    input:
-        path contigs
-    output:
-        path "DVF/*dvfpred.txt"
-    """
-    python ${params.deepvirfinder_path}/dvf.py -i $contigs -o DVF -l 1000 -c 16
-    Rscript ${params.pipeline_directory}/scripts/dvf_filter.R DVF/*dvfpred.txt
-    """
-}
-
-process parse_and_prokka {
-    errorStrategy 'ignore'
-    publishDir "${params.outdir}/analysis", mode: 'copy'
-    conda "/home/molecularvirology/miniconda2/envs/vdp_lrs"
-    label "containerBlast"
-
-    input:
-        path dvf_pred
-        path contigs
-    output:
-        path "prokka/${params.prefix}.tsv"
-        path "prokka/${params.prefix}.gff"
-    """
-    python ${params.pipeline_directory}/scripts/parse_dvf_pred.py $dvf_pred $contigs ${params.prefix}.contigs
-    prokka --kingdom Viruses --outdir prokka --params.prefix ${params.prefix} ${params.prefix}.contigs
-    """
-}
