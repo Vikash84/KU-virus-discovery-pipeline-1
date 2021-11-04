@@ -36,17 +36,17 @@ workflow {
         qc_nanopore_filtered(filtered)
 
         // reference mapping with provided virus sequence lists
-//        reference_map_nanopore(filtered)
+        reference_map_nanopore(filtered)
 
         // read taxon classification
-//        classify_reads_nanopore(filtered)
+        classify_reads_nanopore(filtered)
 
         // de novo assembly
-//        contigs = assemble_nanopore(filtered)
+        contigs = assemble_nanopore(filtered)
 
         // post-assembly work
-//        polished_contigs = polish(contigs, fastq)
+        polished_contigs = polish(contigs, fastq)
 
         // contigs homology search and functional analysis
-//        analyze_contigs(polished_contigs)
+        analyze_contigs(polished_contigs)
 }

@@ -5,7 +5,7 @@ workflow reference_map_illumina {
     take:
         fastq
     main:
-        references = Channel.fromPath(params.ref_vir_list)
+        references = Channel.fromPath(params.reference_virus_list)
                             .splitText()
                             .map{file(it)}
 
@@ -19,30 +19,19 @@ workflow reference_map_illumina {
 
 workflow reference_map_nanopore {
     take:
-        filtered
-        ref_list
+        fastq
 
     main:
-        Channel.fromPath(ref_list)
-            .splitText().map { it -> it.trim() }
-            .map { file(it) }
-            .set { references }
+        references = Channel.fromPath(params.reference_virus_list)
+                            .splitText()
+                            .map{file(it)}
 
-        fastq_ref = filtered.combine(references)
+        fastq_ref = fastq.combine(references)
         bams = each_ref_mapping_nanopore(fastq_ref).filter{it.size()>1000}
         map_info = mapping_summary(bams)
         collection = map_info[0].collectFile(name: "${params.prefix}_temp_colleciton.txt")
         summary_collection = add_header(collection)
         filter(summary_collection)
-}
-
-process generate_ref_vir_channel {
-    input:
-        tuple path(pe1), path(pe2)
-    output:
-        Channel.fromPath('/tmp/Viral_sequences_DB/*/*fas')
-    """
-    """
 }
 
 process split_fastq_tuple {
@@ -64,25 +53,25 @@ process each_ref_mapping_illumina {
     input:
         path(pe1)
         path(pe2)
-        path(ref_fa)
+        path(ref)
     output:
-        path "${params.prefix}_${ref_fa.simpleName}.bam" optional true
+        path "${params.prefix}_${ref.simpleName}.bam" optional true
 
     """
-    bowtie2-build $ref_fa ${ref_fa.baseName}_index
-    bowtie2 -1 $pe1 -2 $pe2 -x ${ref_fa.baseName}_index | samtools view -Sb - | samtools sort - | samtools view -b -F 4 -o "${params.prefix}_${ref_fa.simpleName}.bam"
+    bowtie2-build $ref ${ref.baseName}_index
+    bowtie2 -1 $pe1 -2 $pe2 -x ${ref.baseName}_index | samtools view -Sb - | samtools sort - | samtools view -b -F 4 -o "${params.prefix}_${ref.simpleName}.bam"
     """
 }
 
 process each_ref_mapping_nanopore {
 
     input:
-        tuple path(fastq), path(ref_fa)
+        tuple path(fastq), path(ref)
     output:
-        path "${params.prefix}_${ref_fa.simpleName}.bam" optional true
+        path "${params.prefix}_${ref.simpleName}.bam" optional true
 
     """
-    minimap2 -ax map-ont $ref_fa $fastq | samtools view -Sb - | samtools sort - | samtools view -b -F 4 -o "${params.prefix}_${ref_fa.simpleName}.bam"
+    minimap2 -ax map-ont $ref $fastq | samtools view -Sb - | samtools sort - | samtools view -b -F 4 -o "${params.prefix}_${ref.simpleName}.bam"
     """
 }
 
@@ -97,7 +86,7 @@ process mapping_summary {
         path "${bam.simpleName}.png" optional true
     """
     mkdir each_mapping
-    ~/bamcov -H $bam > each_mapping/"${bam.simpleName}.txt"
+    bamcov -H $bam > each_mapping/"${bam.simpleName}.txt"
     qualimap bamqc -bam $bam -outdir qualimap_results
     mv qualimap_results/images_qualimapReport/genome_coverage_across_reference.png "${bam.simpleName}.png"
     """
@@ -112,7 +101,7 @@ process filter {
         path "${params.prefix}.filtered_reference_mapping_collection.txt"
     
     """
-    python ~/scripts/2_reference_map_result_filter.py --input $collection --output ${params.prefix}.filtered_reference_mapping_collection.txt --min_avg_cov 1.0
+    python ~/scripts/2_reference_map_result_filter.py --input $collection --output ${params.prefix}.filtered_reference_mapping_collection.txt --min_avg_cov ${params.reference_mapping_minimum_avg_coverage}
     """
 }
 

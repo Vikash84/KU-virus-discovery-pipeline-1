@@ -37,7 +37,7 @@ workflow {
         filtered = filter_illumina(fastq1, fastq2)
 
         // reference mapping with provided virus sequence lists
-//        reference_map_illumina(filtered)
+        reference_map_illumina(filtered)
 
         // read taxon classification
         classify_reads_illumina(filtered)
@@ -46,5 +46,5 @@ workflow {
         contigs = assemble_illumina(filtered)
 
         // contigs homology search and functional analysis
-//        analyze_contigs(contigs)
+        analyze_contigs(contigs)
 }

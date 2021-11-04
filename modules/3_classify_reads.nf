@@ -130,20 +130,3 @@ process kaiju2krona {
     ktImportText $kaiju_krona -o ${params.prefix}.kaiju.html
     """
 }
-
-process bracken {
-    errorStrategy 'ignore'
-    publishDir "${params.outdir}/classification", mode: 'copy'
-    input:
-        path kraken_report
-    output:
-        path "${params.prefix}.bracken_all.txt"
-
-    script:
-    """
-    echo "Estimate abundance of taxons at a single level(default species) with bracken"
-    echo "sample name: $params.prefix"
-
-    bracken -d $params.kraken_db_path -i $kraken_report -o ${params.prefix}.bracken_all.txt -l 'S' -t 10 -r 200
-    """
-}

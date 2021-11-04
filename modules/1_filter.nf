@@ -89,14 +89,12 @@ process nanofilt {
     echo "Filter low quality reads"
     echo "sample name: ${params.prefix}"
     echo "input file: $fastq"
-    NanoFilt --length 200 --readtype 1D $fastq > ${params.prefix}.filtered.fastq
+    NanoFilt --length ${params.nanopore_min_read_length} --readtype ${params.nanopore_read_type} $fastq > ${params.prefix}.filtered.fastq
 
     """
 }
 
 process hostfilter_illumina {
-//    errorStrategy { 'ignore' }
-
 
     input:
         tuple path(pe1), path(pe2)
@@ -115,7 +113,6 @@ process hostfilter_illumina {
 }
 
 process hostfilter_nanopore {
-//    errorStrategy { 'ignore' }
 
     publishDir "${params.outdir}/filter", mode: 'copy'
     

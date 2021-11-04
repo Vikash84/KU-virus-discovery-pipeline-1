@@ -6,20 +6,20 @@ from difflib import SequenceMatcher
 import warnings
 
 nextflow_path="/home/molecularvirology/miniconda2/envs/vdp_lrs/bin/"
-host_ref_dir_path = "/media/molecularvirology/b6d973a5-06b6-4aae-9d77-bf28064b405e/Kijin/host_reference"
+host_reference_dir_path = "/media/molecularvirology/b6d973a5-06b6-4aae-9d77-bf28064b405e/Kijin/host_reference"
 
 nextflow_script_path=os.path.dirname(os.path.realpath(__file__))+"/"
 
-host_dict = { 
-              'rhinolophus ferrumequinum' : host_ref_dir_path + "/GCF_004115265.1_mRhiFer1_v1.p_genomic.fna.gz",
-              'pygoscelis antarctica' : host_ref_dir_path + "/GCA_010078415.1_BGI_Pant.V1_genomic.fna.gz",
-              'haemaphysalis longicornis' : host_ref_dir_path + "/GCA_010078415.1_BGI_Pant.V1_genomic.fna.gz",
-              'homo sapiens' : host_ref_dir_path + "/GCF_000001405.39_GRCh38.p13_genomic.fna.gz",
-              'apodemus agrarius' : host_ref_dir_path + "/NC_016428.1_Apodemus_agrarius_mitochondrion.fasta",
-              'apodemus peninsulae' : host_ref_dir_path + "/NC_016060.1_Apodemus_peninsulae_mitochondrion.fasta",
-              'apodemus chejuensis' : host_ref_dir_path + "/NC_016662.1_Apodemus_chejuensis_mitochondrion.fasta",
-              'tscherskia triton' : host_ref_dir_path + "/NC_013068.1_Tscherskia_triton_mitochondrion.fasta",
-              'rattus norvegicus' : host_ref_dir_path + "/GCF_015227675.2_mRatBN7.2_genomic.fna.gz"
+host_reference_dict = { 
+              'rhinolophus ferrumequinum' : host_reference_dir_path + "/GCF_004115265.1_mRhiFer1_v1.p_genomic.fna.gz",  #bat
+              'pygoscelis antarctica' : host_reference_dir_path + "/GCA_010078415.1_BGI_Pant.V1_genomic.fna.gz",        #penguin
+              'haemaphysalis longicornis' : host_reference_dir_path + "/GCA_010078415.1_BGI_Pant.V1_genomic.fna.gz",    #tick
+              'homo sapiens' : host_reference_dir_path + "/GCF_000001405.39_GRCh38.p13_genomic.fna.gz",                 #human
+              'apodemus agrarius' : host_reference_dir_path + "/NC_016428.1_Apodemus_agrarius_mitochondrion.fasta",     
+              'apodemus peninsulae' : host_reference_dir_path + "/NC_016060.1_Apodemus_peninsulae_mitochondrion.fasta",
+              'apodemus chejuensis' : host_reference_dir_path + "/NC_016662.1_Apodemus_chejuensis_mitochondrion.fasta",
+              'tscherskia triton' : host_reference_dir_path + "/NC_013068.1_Tscherskia_triton_mitochondrion.fasta",
+              'rattus norvegicus' : host_reference_dir_path + "/GCF_015227675.2_mRatBN7.2_genomic.fna.gz"
             }
 
 def is_valid_file(parser, arg):
@@ -40,10 +40,14 @@ class HostNameError(ValueError):
         return "invalid host name. Please check the argument '--host'!"
 
 def getHostRefPath(host):
-    if host in host_dict:
-        return host_dict[host]
+    """
+    Recommend the closest host reference
+    if wrong host name is given
+    """
+    if host in host_reference_dict:
+        return host_reference_dict[host]
     else:
-        closest_cands = dict(filter(lambda elem: SequenceMatcher(None, host, elem[0]).ratio() > 0.75, host_dict.items()))
+        closest_cands = dict(filter(lambda elem: SequenceMatcher(None, host, elem[0]).ratio() > 0.75, host_reference_dict.items()))
         for cand in closest_cands :
             ans = input("Did you mean " + cand + "?(y/n)")
             
@@ -54,10 +58,10 @@ def getHostRefPath(host):
                 host = cand
             elif ans == "n":
                 continue
-    if not host in host_dict :
+    if not host in host_reference_dict :
         print("There was no detected host name. Pipeline will run without host filtering.")
     else:
-        return host_dict[host]
+        return host_reference_dict[host]
 
 
 def parseArgsToArgsDictList(args):
@@ -65,7 +69,7 @@ def parseArgsToArgsDictList(args):
     args_dict_list = []
 
     file_input = args.inputs_from_file
-    # get inputs from file input
+    # get multiple inputs from file with -f option
     if file_input:
         with open(file_input) as file:
             lines = file.readlines()
@@ -158,7 +162,7 @@ def parseArgsToCmdList(args):
 
 parser = argparse.ArgumentParser(description= 'Wrapper script for running pipeline')
 
-parser.add_argument('sequencing_type', choices=['nanopore', 'illumina'])
+parser.add_argument('sequencing_type', choices=['nanopore', 'illumina', 'host'])
 
 parser.add_argument('--inputs_from_file', '-f', metavar='file.txt',
         help='Get inputs from this text file. Column header corresponding to the options should be provided')
@@ -172,16 +176,13 @@ parser.add_argument('--fastq2', '-fq2', metavar='fastq_2',
         type=lambda x: is_valid_file(parser, x)) 
 
 parser.add_argument('--prefix', '-p', metavar='name',
-        help='Labels for each input fastq')
+        help='Labels for input')
 
 parser.add_argument('--outdir', '-d', metavar='dir',
         help='Name of output directory')
 
 parser.add_argument('--host', metavar='host',
-        help='Scientific name of host organism'),
-
-parser.add_argument('--reference', metavar='ref',
-        help='The location of the directory where reference virus sequences are located')
+        help='Scientific name of host organism. Type "wrapper.py host" to get the list of avaible host names'),
 
 parser.add_argument('--background', '-bg', action='store_true',
         help='Whether nextflow run in background or not')
@@ -194,10 +195,14 @@ parser.add_argument('--test', action='store_true',
 
 args = parser.parse_args()
 
+if args.sequencing_type == "host":
+    print('\n'.join(host_reference_dict.keys()))
+    print('\nAbove are available host genomes.\nYou need to add to wrapper.py if you want to add new host genome.')
+    exit()
+
 cmd_list = parseArgsToCmdList(args)
 
 test = args.test
-reference = args.reference
 background = args.background
 resume = args.resume
 
@@ -205,7 +210,6 @@ for cmd in cmd_list :
     t = time.localtime()
     curr_time = time.strftime("%Y_%m_%d_%H_%M_%S", t)
     cmd += "" if test else (" -with-report " + curr_time  + "_nextflow_running_report.html" + " -with-trace " + curr_time + "_nextflow_trace_report.txt" + " -with-timeline " + curr_time + "_nextflow_timeline_report.html")
-    cmd += (" --reference_vir_path \"" + reference + "\"") if reference else ""
     cmd += " -bg " if background else ""
     cmd += " -resume " if resume else ""
     subprocess.run(cmd, shell=True, check=True)    
