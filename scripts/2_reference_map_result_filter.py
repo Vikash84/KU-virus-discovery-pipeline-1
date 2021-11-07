@@ -21,7 +21,8 @@ parser.add_argument('--min_avg_cov', type=float, default=1.0,
 
 args = parser.parse_args()
 
-df = pd.read_csv(args.input, sep='\t', header=0)
+df = pd.read_csv(args.input, sep='\t', header=0, usecols=lambda x: x != "START")
+df.rename(columns={"END" : "LEN"})
 
 min_avg_cov_filter = df['AVG_COV'] > args.min_avg_cov
 composite_filter = min_avg_cov_filter

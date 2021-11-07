@@ -5,7 +5,7 @@ workflow reference_map_illumina {
     take:
         fastq
     main:
-        references = Channel.fromPath(params.reference_virus_list)
+        references = Channel.fromPath(params.reference_virus_list_path)
                             .splitText()
                             .map{file(it)}
 
@@ -22,7 +22,7 @@ workflow reference_map_nanopore {
         fastq
 
     main:
-        references = Channel.fromPath(params.reference_virus_list)
+        references = Channel.fromPath(params.reference_virus_list_path)
                             .splitText()
                             .map{file(it)}
 
