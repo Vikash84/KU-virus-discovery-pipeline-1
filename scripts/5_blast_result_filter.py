@@ -15,10 +15,6 @@ parser.add_argument('--input', '-i', metavar='blast.txt',
 
 parser.add_argument('--output', '-o', metavar='blast_filtered.txt',
         help='Onput file name where filtered result will be written')
-    
-parser.add_argument('--exclude', '-e', metavar='excluding_keyword.txt',
-        help='List of keywords to be excluded from blast result',
-        type=lambda x: is_valid_file(parser, x)) 
 
 parser.add_argument('--aln_len', '-al', type=int, default=0,
         help='Hit below this align length will be filtered')
@@ -34,15 +30,6 @@ aln_len_filter = df['ALN_LEN'] > args.aln_len
 aln_contig_len_prop_filter = ( df['ALN_LEN'] / df['QUERY_LEN'] ) > args.aln_contig_len_prop
 
 composite_filter = aln_len_filter & aln_contig_len_prop_filter
-
-if args.exclude:
-    with open(args.exclude) as f:
-        content = f.readlines()
-
-        excluding_keywords = [x.strip() for x in content]
-        exclude_filter = df['REF_TITLE'].str.contains('(?i)' + '|'.join(excluding_keywords)) == False
-
-        composite_filter = composite_filter & exclude_filter
 
 filtered_df = df[composite_filter]
 evalue_sorted_df = filtered_df.sort_values(by='EVALUE')

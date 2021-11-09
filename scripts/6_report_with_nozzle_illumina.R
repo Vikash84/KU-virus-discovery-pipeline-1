@@ -4,26 +4,28 @@
 ###############################################################
 
 suppressPackageStartupMessages(library("argparser"))
-require( "Nozzle.R1" );
+require("Nozzle.R1");
 require("dplyr");
 require("data.table");
 require("DT");
 
+pipeline_version <- "v2.0"
+
 # --- Parsing functions ---
 
-refMapFileToTable <- function(text_file) {
+ref_map_to_table <- function(text_file) {
   ret <- read.table(text_file, header = TRUE, sep = "", strip.white = TRUE)
   ret <- select(ret, -c("N_COVERED_BASES", "AVG_BASEQ", "AVG_MAPQ"))
   return(ret)
 }
 
-AssembleSummaryFileToTable <- function(text_file) {
+assembly_summary_to_table <- function(text_file) {
   ret <- read.table(text_file, header = FALSE, sep = ":", fill = TRUE, strip.white = TRUE)
   colnames(ret) <- c("Feature", "Value")
   return(ret)
 }
 
-blastFileToTable <- function(text_file) {
+blast_to_table <- function(text_file) {
   ret <- read.table(text_file, header = TRUE, sep = "\t", strip.white = TRUE, quote="", fill=TRUE)
   ret$BITSCORE <- as.integer(ret$BITSCORE)
   ret$TAXID <- as.factor(ret$TAXID)
@@ -37,11 +39,11 @@ blastFileToTable <- function(text_file) {
   return(ret)
 }
 
-uniq_ref_species <- function(blastTable) {
-  ret <- blastTable[order(-blastTable$"BITSCORE"),]
+uniq_ref_species <- function(blast_table) {
+  ret <- blast_table[order(-blast_table$"BITSCORE"),]
   ret$species <- as.character(ret$species)
   ret <- ret[!duplicated(ret[ , "species"]), ]
-  cnt <- as.data.frame(table(blastTable$"species"))
+  cnt <- as.data.frame(table(blast_table$"species"))
   colnames(cnt) <- c("species", "NUM_CONTIGS")
 
   ret <- inner_join(ret, cnt, by = "species")
@@ -58,6 +60,8 @@ p <- arg_parser("Illumina analysis report generating program")
 # --- Script parameter parsing ---
 
 p <- add_argument(p, "--prefix", help="Sample prefix")
+
+p <- add_argument(p, "--host", help="Sample host")
 
 p <- add_argument(p, "--multiqc_html", help="Multiqc html file path")
 
@@ -85,6 +89,7 @@ args <- parse_args(p)
 
 prefix <- args$prefix
 
+host <- args$host
 
 # qc data
 
@@ -134,19 +139,19 @@ if(is.na(args$assembly_length_histogram)){
 # blast data
 
 if(is.na(args$blastn_table)){
-  blast_blastn_file <- paste(prefix, "/analysis/", prefix, ".blastn.viruses.txt", sep="")
+  blast_blastn_file <- paste(prefix, "/analysis/", prefix, ".blastn.txt", sep="")
 } else{
   blast_blastn_file <- args$blastn_table
 }
 
 if(is.na(args$megablast_table)){
-  blast_megablast_file <- paste(prefix, "/analysis/", prefix, ".megablast.viruses.txt", sep="")
+  blast_megablast_file <- paste(prefix, "/analysis/", prefix, ".megablast.txt", sep="")
 } else{
   blast_megablast_file <- args$megablast_table
 }
 
 if(is.na(args$blastx_table)){
-  blast_blastx_file <- paste(prefix, "/analysis/", prefix, ".blastx.viruses.txt", sep="")
+  blast_blastx_file <- paste(prefix, "/analysis/", prefix, ".blastx.txt", sep="")
 } else{
   blast_blastx_file <- args$blastx_table
 }
@@ -159,11 +164,10 @@ if(is.na(args$blastx_table)){
 
 # reference mapping data
 if(file.exists(ref_map_summary_file)){
-  ref_map_summary_table <- refMapFileToTable(ref_map_summary_file)
+  ref_map_summary_table <- ref_map_to_table(ref_map_summary_file)
 } else{
   ref_map_summary_table <- data.table()
 }
-#ref_map_virus_list <- 
 
 # classification heatmap image files
 classification_order_heatmap_file <- paste(classification_base_dir_path, "/", prefix, "_order.svg", sep = "")
@@ -172,15 +176,15 @@ classification_genus_heatmap_file <- paste(classification_base_dir_path, "/", pr
 classification_species_heatmap_file <- paste(classification_base_dir_path, "/", prefix, "_species.svg", sep = "")
 
 # de novo assembly data
-assemble_summary_table <- AssembleSummaryFileToTable(assemble_summary_file)
+assemble_summary_table <- assembly_summary_to_table(assemble_summary_file)
 
 # blast data
 
-blast_blastn_table <- blastFileToTable(blast_blastn_file)
+blast_blastn_table <- blast_to_table(blast_blastn_file)
 blast_uniq_blastn_table <- uniq_ref_species(blast_blastn_table)
-blast_megablast_table <- blastFileToTable(blast_megablast_file)
+blast_megablast_table <- blast_to_table(blast_megablast_file)
 blast_uniq_megablast_table <- uniq_ref_species(blast_megablast_table)
-blast_blastx_table <- blastFileToTable(blast_blastx_file)
+blast_blastx_table <- blast_to_table(blast_blastx_file)
 blast_uniq_blastx_table <- uniq_ref_species(blast_blastx_table)
 
 table_header_order <- c("superkingdom", "phylum", "class", "order", "family", "genus", "species", "TAXID", "REF_ID", "REF_TITLE", "QUERY_ID", "REF_ID", "EVALUE", "BITSCORE", "PER_IDENT", "QUERY_LEN", "ALN_LEN", "MISMATCH", "GAPOPEN", "QSTART", "QEND", "REFSTART", "REFEND")
@@ -239,7 +243,7 @@ saveWidget(blastx_datatable, paste(getwd(),"/",prefix,"/", blastx_html_link, sep
 #===================================================================================================
 
 report <- newReport( paste(prefix, "KU Pipeline Analysis Report" ) );
-report <- setReportSubTitle( report, "A report that showcases results generated from KU pipeline" );
+report <- setReportSubTitle( report, paste("A report that displays the results generated from KU pipeline", pipeline_version));
 
 # --- References ---
 
@@ -251,6 +255,10 @@ report <- setReportSubTitle( report, "A report that showcases results generated 
 
 #report <- addToReferences( report, simpleCitation, webCitation, fullCitation );
 
+# --- Overview ---
+report <- addToIntroduction( report,
+				newParagraph( "This report contains the analysis result of the Illumina sequencing throughput originated from the sample named ", asEmph( prefix ), "." ) ); 
+
 # --- Results ---
 
 # create objects
@@ -259,9 +267,9 @@ multiqc_link <- newParagraph( asLink( "MultiQC report", url=qc_link ));
 
 if(nrow(ref_map_summary_table) > 0){
   ref_map_table <- newTable( ref_map_summary_table,
-				"Reference mapping summary. Column follows bamcov format.");
+				"Sequenced reads are mapped to virus sequences provided as a list.");
 } else{
-  ref_map_table <- newParagraph ("Not mapped to any provided reference sequence.")
+  ref_map_table <- newParagraph ("Not mapped to any provided virus sequence.")
 
 }
 classification_order_heatmap <- newFigure(classification_order_heatmap_file, "Order-level heatmap")
@@ -272,10 +280,10 @@ classification_species_heatmap <- newFigure(classification_species_heatmap_file,
 kraken_link <- newParagraph( asLink( "Kraken result", url=classification_kraken_link ));
 
 assemble_table <- newTable( assemble_summary_table,
-        "Summary statistics of assembled contigs.");
+        "Summary statistics of assembled contigs");
 
 assemble_contig_length_histogram_figure <- newFigure( assemble_contig_length_histogram_file,
-                                                      "")
+                                                      "Length distribution of assembled contigs")
 						
 blast_table_1 <- newTable( blast_uniq_blastn_table,
 				"blastn result", file=blastn_html_link);

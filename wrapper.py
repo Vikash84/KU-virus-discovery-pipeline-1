@@ -146,7 +146,7 @@ class Arguments:
             cmd += "--" + key + " " + args_dict_[key] + " "
         return cmd
     
-    def parse_args_dict_list_to_cmd_list(self):
+    def to_cmd_list(self):
         cmd_list = []
         for args_dict in self.args_dict_list:
             cmd_list.append(self.parse_args_dict_to_cmd(args_dict))
@@ -196,7 +196,7 @@ if args.sequencing_type == "host":
 args_obj = Arguments(args)
 args_obj.valid_check()
 
-cmd_list = args_obj.parse_args_dict_list_to_cmd_list()
+cmd_list = args_obj.to_cmd_list()
 
 test = args.test
 background = args.background

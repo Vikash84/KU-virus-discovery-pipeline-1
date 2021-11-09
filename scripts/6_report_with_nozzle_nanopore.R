@@ -4,27 +4,29 @@
 ###############################################################
 
 suppressPackageStartupMessages(library("argparser"))
-require( "Nozzle.R1" );
+require("Nozzle.R1");
 require("dplyr");
 require("data.table");
 require("DT");
 
+pipeline_version <- "v2.0"
+
 # --- Parsing functions ---
 
-refMapFileToTable <- function(text_file) {
+ref_map_to_table <- function(text_file) {
   ret <- read.table(text_file, header = TRUE, sep = "", strip.white = TRUE)
   ret <- select(ret, -c("N_COVERED_BASES", "AVG_BASEQ", "AVG_MAPQ"))
   return(ret)
 }
 
-AssembleSummaryFileToTable <- function(text_file) {
+assembly_summary_to_table <- function(text_file) {
   ret <- read.table(text_file, header = FALSE, sep = ":", fill = TRUE, strip.white = TRUE)
   colnames(ret) <- c("Feature", "Value")
   return(ret)
 }
 
-blastFileToTable <- function(text_file) {
-  ret <- read.table(text_file, header = TRUE, sep = "\t", strip.white = TRUE, quote="")
+blast_to_table <- function(text_file) {
+  ret <- read.table(text_file, header = TRUE, sep = "\t", strip.white = TRUE, quote="", fill = TRUE)
   ret$BITSCORE <- as.integer(ret$BITSCORE)
   ret$TAXID <- as.factor(ret$TAXID)
   ret$superkingdom <- as.factor(ret$superkingdom)
@@ -37,11 +39,11 @@ blastFileToTable <- function(text_file) {
   return(ret)
 }
 
-uniq_ref_species <- function(blastTable) {
-  ret <- blastTable[order(-blastTable$"BITSCORE"),]
+uniq_ref_species <- function(blast_table) {
+  ret <- blast_table[order(-blast_table$"BITSCORE"),]
   ret$species <- as.character(ret$species)
   ret <- ret[!duplicated(ret[ , "species"]), ]
-  cnt <- as.data.frame(table(blastTable$"species"))
+  cnt <- as.data.frame(table(blast_table$"species"))
   colnames(cnt) <- c("species", "NUM_CONTIGS")
 
   ret <- inner_join(ret, cnt, by = "species")
@@ -166,7 +168,7 @@ if(is.na(args$blastx_table)){
 
 # reference mapping data
 if(file.exists(ref_map_summary_file)){
-  ref_map_summary_table <- refMapFileToTable(ref_map_summary_file)
+  ref_map_summary_table <- ref_map_to_table(ref_map_summary_file)
 } else {
   ref_map_summary_table <- data.table()
 }
@@ -180,21 +182,21 @@ classification_genus_heatmap_file <- paste(classification_base_dir_path, "/", pr
 classification_species_heatmap_file <- paste(classification_base_dir_path, "/", prefix, "_species.svg", sep = "")
 
 # de novo assembly data
-assemble_summary_table <- AssembleSummaryFileToTable(assemble_summary_file)
+assemble_summary_table <- assembly_summary_to_table(assemble_summary_file)
 
 # blast data
 
-blast_blastn_table <- blastFileToTable(blast_blastn_file)
+blast_blastn_table <- blast_to_table(blast_blastn_file)
 blast_uniq_blastn_table <- uniq_ref_species(blast_blastn_table)
 
 if(file.exists(blast_megablast_file)){
-  blast_megablast_table <- blastFileToTable(blast_megablast_file)
+  blast_megablast_table <- blast_to_table(blast_megablast_file)
   blast_uniq_megablast_table <- uniq_ref_species(blast_megablast_table)
 }
 
 
 if(file.exists(blast_blastx_file)){
-  blast_blastx_table <- blastFileToTable(blast_blastx_file)
+  blast_blastx_table <- blast_to_table(blast_blastx_file)
   blast_uniq_blastx_table <- uniq_ref_species(blast_blastx_table)
 }
 
@@ -256,7 +258,7 @@ if(file.exists(blast_blastx_file)){
 #===================================================================================================
 
 report <- newReport( paste(prefix, "KU Pipeline Analysis Report" ) );
-report <- setReportSubTitle( report, "A report that showcases results generated from KU pipeline" );
+report <- setReportSubTitle( report, paste("A report that displays the results generated from KU pipeline", pipeline_version) );
 
 # --- References ---
 
@@ -267,6 +269,11 @@ report <- setReportSubTitle( report, "A report that showcases results generated 
 #fullCitation <- newCitation( authors="Nils Gehlenborg", title="Nozzle: a report generation toolkit for data analysis pipelines", publication="Bioinformatics", issue="29", pages="1089-1091", year="2013", url="http://bioinformatics.oxfordjournals.org/content/29/8/1089" );
 
 #report <- addToReferences( report, simpleCitation, webCitation, fullCitation );
+
+# --- Overview ---
+report <- addToIntroduction( report,
+				newParagraph( "This report contains the analysis result of the Nanopore sequencing throughput originated from the sample named ", asEmph( prefix ), "." ) ); 
+
 
 # --- Results ---
 
@@ -292,10 +299,10 @@ kraken_link <- newParagraph( asLink( "Kraken result", url=classification_kraken_
 kaiju_link <- newParagraph( asLink( "Kaiju result", url=classification_kaiju_link ));
 
 assemble_table <- newTable( assemble_summary_table,
-        "Summary statistics of assembled contigs.");
+        "Summary statistics of assembled contigs");
 
 assemble_contig_length_histogram_figure <- newFigure( assemble_contig_length_histogram_file,
-                                                      "")
+                                                      "Length distribution of assembled contigs")
 						
 blast_table_1 <- newTable( blast_uniq_blastn_table,
 				"blastn result", file=blastn_html_link);

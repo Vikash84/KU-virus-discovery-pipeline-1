@@ -15,11 +15,11 @@ workflow assemble_illumina {
 
 workflow assemble_nanopore {
     take:
-        filtered
+        fastq
     emit:
         contigs
     main:
-        megahit_contigs = megahit(filtered)
+        megahit_contigs = megahit(fastq)
         contigs = megahit_contigs
         filtered_contigs = filterContigs_nanopore(contigs)
         contigSummary(filtered_contigs)

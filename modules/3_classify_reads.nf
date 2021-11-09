@@ -2,9 +2,9 @@ nextflow.enable.dsl=2
 
 workflow classify_reads_illumina {
     take:
-        filtered_fastqs
+        fastqs
     main:
-        kraken_result = kraken2_illumina(filtered_fastqs)
+        kraken_result = kraken2_illumina(fastqs)
         kreport2krona(kraken_result)
         edge_form = kreport2EDGEform(kraken_result)
         EDGEform2heatmap(edge_form)
@@ -12,13 +12,14 @@ workflow classify_reads_illumina {
 
 workflow classify_reads_nanopore {
     take:
-        filtered
+        fastq
     main:
-        kraken_result = kraken2_nanopore(filtered)
+        kraken_result = kraken2_nanopore(fastq)
         kreport2krona(kraken_result)
         edge_form = kreport2EDGEform(kraken_result)
         EDGEform2heatmap(edge_form)
-        kaiju_result = kaiju_nanopore(filtered)
+
+        kaiju_result = kaiju_nanopore(fastq)
         kaiju2krona(kaiju_result)
 }
 
@@ -62,7 +63,7 @@ process kraken2_illumina {
     echo "kraken db path: $params.kraken_db_path"
     kraken2 --db $params.kraken_db_path \
         --report ${params.prefix}.kraken_report.csv \
-        --paired --threads 12 \
+        --paired --threads 12 --confidence 0.1\
         $pe1 $pe2
     """
 }
@@ -79,7 +80,8 @@ process kraken2_nanopore {
     echo "kraken db path: $params.kraken_db_path"
     kraken2 --db $params.kraken_db_path \
         --report ${params.prefix}.kraken_report.csv \
-        --threads 12 $fastq
+        --threads 12 --confidence 0.1\
+        $fastq
     """
 }
 
