@@ -18,6 +18,8 @@ if(params.help) {
     log.info '    --fastq        FILE    Path to FASTQ file'
     log.info '    --prefix        STR    Nickname given to sample'
     log.info '    --outdir         DIR      Name of output directory'
+    log.info '    --host         STR      Name of host the sample originate from'
+    log.info '    --host_reference_path         STR      Path to the fast of host genome'
     log.info ''
 
     return

@@ -72,46 +72,46 @@ class HostNameError(ValueError):
         
 class IlluminaArguments:
     def __init__(self, prefix_, outdir_, host_, fastq_, fastq2_):
-        self.platform               = "illumina"
-        self.prefix                 = prefix_
-        self.outdir                 = outdir_
+        self.platform = "illumina"
+        self.prefix = prefix_
+        self.outdir = outdir_
         
-        self.host                   = None
-        self.host_reference_path    = None
+        self.host = None
+        self.host_reference_path = None
 
         if host_:
-            host_reference_path    = get_host_reference_path(host_)
+            host_reference_path = get_host_reference_path(host_)
             if host_reference_path:
-                self.host               = host_
+                self.host = host_
                 self.host_reference_path = host_reference_path
         
-        self.fastq                  = fastq_       
-        self.fastq2                 = fastq2_
+        self.fastq = fastq_       
+        self.fastq2 = fastq2_
 
 class NanoporeArguments:
     def __init__(self, prefix_, outdir_, host_, fastq_):
-        self.platform               = "nanopore"
-        self.prefix                 = prefix_
-        self.outdir                 = outdir_
+        self.platform = "nanopore"
+        self.prefix = prefix_
+        self.outdir = outdir_
 
-        self.host                   = None
-        self.host_reference_path    = None
+        self.host = None
+        self.host_reference_path = None
 
         if host_:
-            host_reference_path    = get_host_reference_path(host_)
+            host_reference_path = get_host_reference_path(host_)
             if host_reference_path:
-                self.host               = host_
+                self.host = host_
                 self.host_reference_path = host_reference_path
 
-        self.fastq                  = fastq_
+        self.fastq = fastq_
 
 class PseudoArgs:
     def __init__(self, prefix_, outdir_, host_, fastq_, fastq2_= None):
-        self.prefix             = prefix_
-        self.outdir             = outdir_
-        self.host               = host_
-        self.fastq              = fastq_
-        self.fastq2             = fastq2_
+        self.prefix = prefix_
+        self.outdir = outdir_
+        self.host = host_
+        self.fastq = fastq_
+        self.fastq2 = fastq2_
 
 def parse_one_input(platform, args_):
 
@@ -198,15 +198,15 @@ def parse_arguments_to_cmd(Arguments_):
     else:
         cmd = cmd + "main_nanopore.nf "
 
-    cmd += "--prefix "                    + Arguments_.prefix + " "
-    cmd += "--outdir "                    + Arguments_.outdir + " "
+    cmd += "--prefix " + Arguments_.prefix + " "
+    cmd += "--outdir " + Arguments_.outdir + " "
     if(Arguments_.host):
-        cmd += "--host "                  + "\"" + Arguments_.host + "\" "
-        cmd += "--host_reference_path "   + Arguments_.host_reference_path + " "
-    cmd += "--fastq "                     + Arguments_.fastq + " "
+        cmd += "--host " + "\"" + Arguments_.host + "\" "
+        cmd += "--host_reference_path " + Arguments_.host_reference_path + " "
+    cmd += "--fastq " + Arguments_.fastq + " "
 
     if Arguments_.platform == "illumina":
-        cmd += "--fastq2 "                + Arguments_.fastq2
+        cmd += "--fastq2 " + Arguments_.fastq2
 
     
     return cmd
@@ -270,13 +270,16 @@ test = args.test
 background = args.background
 resume = args.resume
 
-for cmd in cmd_list :
+for i in range(len(cmd_list)) :
+    cmd = cmd_list[i]
     t = time.localtime()
     curr_time = time.strftime("%Y_%m_%d_%H_%M_%S", t)
     cmd += "" if test else (" -with-report " + curr_time  + "_nextflow_running_report.html" + " -with-trace " + curr_time + "_nextflow_trace_report.txt" + " -with-timeline " + curr_time + "_nextflow_timeline_report.html")
     cmd += " -bg " if background else ""
     cmd += " -resume " if resume else ""
-    print(cmd)
-    #subprocess.run(cmd, shell=True, check=True)
+    subprocess.run(cmd, shell=True, check=True)
 
-
+    prefix = arguments_list[i].prefix
+    report_cmd = "Rscript " + nextflow_script_path + "module/6_report_with_nozzle_" + platform + ".R --prefix " + prefix
+    subprocess.run(report_cmd, shell=True, check=True)
+    

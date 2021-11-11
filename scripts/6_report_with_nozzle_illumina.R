@@ -61,8 +61,6 @@ p <- arg_parser("Illumina analysis report generating program")
 
 p <- add_argument(p, "--prefix", help="Sample prefix")
 
-p <- add_argument(p, "--host", help="Sample host")
-
 p <- add_argument(p, "--multiqc_html", help="Multiqc html file path")
 
 p <- add_argument(p, "--mapping_summary", help="Reference mapping summary file path")
@@ -88,8 +86,6 @@ p <- add_argument(p, "--blast_table_output_dir", help="Ouput directory path wher
 args <- parse_args(p)
 
 prefix <- args$prefix
-
-host <- args$host
 
 # qc data
 
