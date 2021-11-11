@@ -84,7 +84,7 @@ process add_header_filter {
         path "${params.prefix}.reference_mapping_collection.txt"
     
     """
-    cat ~/headers/bamcov_header $collection > ${params.prefix}.tmp
-    python ~/scripts/2_reference_map_result_filter.py --input ${params.prefix}.tmp --output ${params.prefix}.reference_mapping_collection.txt --min_avg_cov ${params.reference_mapping_minimum_avg_coverage}
+    cat ${params.nextflow_script_path}/headers/bamcov_header $collection > ${params.prefix}.tmp
+    python ${params.nextflow_script_path}/scripts/2_reference_map_result_filter.py --input ${params.prefix}.tmp --output ${params.prefix}.reference_mapping_collection.txt --min_avg_cov ${params.reference_mapping_minimum_avg_coverage}
     """
 }

@@ -48,9 +48,9 @@ process parseBlastn {
     output:
         path "${params.prefix}.blastn.txt"
     """
-    cat ~/headers/blast_header $result > ${result.baseName}.headered.tmp
-    python ~/scripts/5_blast_result_filter.py --input ${result.baseName}.headered.tmp --output ${result.baseName}.filtered.tmp --aln_len 100 --aln_contig_len_prop 0.5
-    Rscript ~/scripts/5_match_taxonomy_to_blast_result.R ${result.baseName}.filtered.tmp ${params.prefix}.blastn.txt ${params.taxonomizr_db_path}
+    cat ${params.nextflow_script_path}/headers/blast_header $result > ${result.baseName}.headered.tmp
+    python ${params.nextflow_script_path}/scripts/5_blast_result_filter.py --input ${result.baseName}.headered.tmp --output ${result.baseName}.filtered.tmp --aln_len 100 --aln_contig_len_prop 0.5
+    Rscript ${params.nextflow_script_path}/scripts/5_match_taxonomy_to_blast_result.R ${result.baseName}.filtered.tmp ${params.prefix}.blastn.txt ${params.taxonomizr_db_path}
     """
 }
 
@@ -63,9 +63,9 @@ process parseMegaBlast {
     output:
         path "${params.prefix}.megablast.txt"
     """
-    cat ~/headers/blast_header $result > ${result.baseName}.headered.tmp
-    python ~/scripts/5_blast_result_filter.py --input ${result.baseName}.headered.tmp --output ${result.baseName}.filtered.tmp --aln_len 100 --aln_contig_len_prop 0.5
-    Rscript ~/scripts/5_match_taxonomy_to_blast_result.R ${result.baseName}.filtered.tmp ${params.prefix}.megablast.txt ${params.taxonomizr_db_path}
+    cat ${params.nextflow_script_path}/headers/blast_header $result > ${result.baseName}.headered.tmp
+    python ${params.nextflow_script_path}/scripts/5_blast_result_filter.py --input ${result.baseName}.headered.tmp --output ${result.baseName}.filtered.tmp --aln_len 100 --aln_contig_len_prop 0.5
+    Rscript ${params.nextflow_script_path}/scripts/5_match_taxonomy_to_blast_result.R ${result.baseName}.filtered.tmp ${params.prefix}.megablast.txt ${params.taxonomizr_db_path}
     """
 }
 
@@ -78,8 +78,8 @@ process parseDiamondBlastx {
     output:
         path "${params.prefix}.blastx.txt"
     """
-    cat ~/headers/blast_header $result > ${result.baseName}.headered.tmp
-    python ~/scripts/5_blast_result_filter.py --input ${result.baseName}.headered.tmp --output ${result.baseName}.filtered.tmp --aln_len 33 --aln_contig_len_prop 0.17
-    Rscript ~/scripts/5_match_taxonomy_to_blast_result.R ${result.baseName}.filtered.tmp ${params.prefix}.blastx.txt ${params.taxonomizr_db_path}
+    cat ${params.nextflow_script_path}/headers/blast_header $result > ${result.baseName}.headered.tmp
+    python ${params.nextflow_script_path}/scripts/5_blast_result_filter.py --input ${result.baseName}.headered.tmp --output ${result.baseName}.filtered.tmp --aln_len 33 --aln_contig_len_prop 0.17
+    Rscript ${params.nextflow_script_path}/scripts/5_match_taxonomy_to_blast_result.R ${result.baseName}.filtered.tmp ${params.prefix}.blastx.txt ${params.taxonomizr_db_path}
     """
 }

@@ -272,6 +272,7 @@ resume = args.resume
 
 for i in range(len(cmd_list)) :
     cmd = cmd_list[i]
+    cmd += " --nextflow_script_path " + nextflow_script_path
     t = time.localtime()
     curr_time = time.strftime("%Y_%m_%d_%H_%M_%S", t)
     cmd += "" if test else (" -with-report " + curr_time  + "_nextflow_running_report.html" + " -with-trace " + curr_time + "_nextflow_trace_report.txt" + " -with-timeline " + curr_time + "_nextflow_timeline_report.html")
@@ -280,6 +281,6 @@ for i in range(len(cmd_list)) :
     subprocess.run(cmd, shell=True, check=True)
 
     prefix = arguments_list[i].prefix
-    report_cmd = "Rscript " + nextflow_script_path + "module/6_report_with_nozzle_" + platform + ".R --prefix " + prefix
+    report_cmd = "Rscript " + nextflow_script_path + "scripts/6_report_with_nozzle_" + platform + ".R --prefix " + prefix
     subprocess.run(report_cmd, shell=True, check=True)
     
