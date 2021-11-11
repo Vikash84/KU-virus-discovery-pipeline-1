@@ -1,12 +1,18 @@
 import os
+import sys
 import time
 import argparse
 import subprocess
 from difflib import SequenceMatcher
 import warnings
+import pandas as pd
 
-nextflow_path=""
-host_reference_dir_path = ""
+####################################################################
+###########             path should be given             ###########
+####################################################################
+nextflow_path="" # nextflow binary path
+host_reference_dir_path = "" # directory containing host reference sequences
+####################################################################
 
 nextflow_script_path=os.path.dirname(os.path.realpath(__file__))+"/"
 
@@ -20,7 +26,7 @@ host_reference_dict = {
 #              'apodemus chejuensis' : host_reference_dir_path + "/NC_016662.1_Apodemus_chejuensis_mitochondrion.fasta",
 #              'tscherskia triton' : host_reference_dir_path + "/NC_013068.1_Tscherskia_triton_mitochondrion.fasta",
 #              'rattus norvegicus' : host_reference_dir_path + "/GCF_015227675.2_mRatBN7.2_genomic.fna.gz",
-            }
+                }
 
 def is_valid_file(parser_, arg_):
     if not os.path.exists(arg_):
@@ -47,7 +53,8 @@ def get_host_reference_path(host_):
             elif ans == "n":
                 continue
     if host_ not in host_reference_dict :
-        print("There was no detected host name. Pipeline will run without host filtering step.")
+        warnings.warn("There was no detected host genome. Pipeline will run without host filtering step.")
+        return None
     else:
         return host_reference_dict[host_]
 
@@ -62,100 +69,151 @@ class FastqError(ValueError):
 class HostNameError(ValueError):
     def __str__(self):
         return "invalid host name. Please check the argument '--host'!"
+        
+class IlluminaArguments:
+    def __init__(self, prefix_, outdir_, host_, fastq_, fastq2_):
+        self.platform               = "illumina"
+        self.prefix                 = prefix_
+        self.outdir                 = outdir_
+        
+        self.host                   = None
+        self.host_reference_path    = None
 
-class Arguments:
-    def __init__(self, args_):
-        self.args_dict_list = []
+        if host_:
+            host_reference_path    = get_host_reference_path(host_)
+            if host_reference_path:
+                self.host               = host_
+                self.host_reference_path = host_reference_path
+        
+        self.fastq                  = fastq_       
+        self.fastq2                 = fastq2_
 
-        file_input = args_.inputs_from_file
-        # get multiple inputs from file with -f option
-        if file_input:
-            with open(file_input) as file:
-                lines = file.readlines()
-                header = [ x.strip() for x in lines[0].split('\t') ]
-                for line in lines[1:]:
-                    if line == "\n":
-                        continue
-                    li = [ x.strip() for x in line.split('\t') ]
-                    args_dict = {}
-                    args_dict["sequencing_type"] = args_.sequencing_type
-                    host = ""
-                    for index in range(len(header)) :
-                        col_name = header[index]
-                        if col_name == "host":
-                            host = li[index]
-                        else:
-                            args_dict[col_name] = '"' + li[index] + '"'
+class NanoporeArguments:
+    def __init__(self, prefix_, outdir_, host_, fastq_):
+        self.platform               = "nanopore"
+        self.prefix                 = prefix_
+        self.outdir                 = outdir_
 
-                    if host and host.lower() != "none" and get_host_reference_path(host.lower()):
-                        args_dict["host"] = '"' + host.lower() + '"'
-                        args_dict["host_reference_path"] = get_host_reference_path(host.lower())
-                    # if host not given, host filtering is not executed
+        self.host                   = None
+        self.host_reference_path    = None
 
-                    if not "outdir" in args_dict and "prefix" in args_dict:
-                        args_dict["outdir"] = args_dict["prefix"]
-                                    
-                    self.args_dict_list.append(args_dict)
+        if host_:
+            host_reference_path    = get_host_reference_path(host_)
+            if host_reference_path:
+                self.host               = host_
+                self.host_reference_path = host_reference_path
 
-        # one input
+        self.fastq                  = fastq_
+
+class PseudoArgs:
+    def __init__(self, prefix_, outdir_, host_, fastq_, fastq2_= None):
+        self.prefix             = prefix_
+        self.outdir             = outdir_
+        self.host               = host_
+        self.fastq              = fastq_
+        self.fastq2             = fastq2_
+
+def parse_one_input(platform, args_):
+
+    if platform == "illumina":
+        if args_.outdir:
+            arguments = IlluminaArguments(args_.prefix, args_.outdir, args_.host, args_.fastq, args_.fastq2)
+        else: # if outdir not provided, prefix will replace it
+            arguments = IlluminaArguments(args_.prefix, args_.prefix, args_.host, args_.fastq, args_.fastq2)
+    
+    elif platform == "nanopore":
+        if args_.outdir:
+            arguments = NanoporeArguments(args_.prefix, args_.outdir, args_.host, args_.fastq)
+        else: # if outdir not provided, prefix will replace it
+            arguments = NanoporeArguments(args_.prefix, args_.prefix, args_.host, args_.fastq)
+    
+    else:
+        sys.exit("This cannot happen. Ask to the developer.")
+
+    return arguments
+
+def parse_file_input(platform_, file_input_):
+
+    df = pd.read_csv(file_input_, header=0, sep="\t")
+
+    df_colnames = list(df)
+    allowed_colnames = ["prefix", "outdir", "host", "fastq", "fastq2"]
+    for colname in df_colnames:
+        if colname not in allowed_colnames:
+            sys.exit("Wrong column names are used. Check your input file.\nAllowed names are " + ",".join(allowed_colnames) + ".")
+
+    if "prefix" not in df_colnames or "fastq" not in df_colnames:
+        "At least prefix and fastq columns are required"
+    
+    if platform_ == "illumina" and "fastq2" not in df_colnames:
+        sys.exit("Pipeline only supports paired-end Illumina sequencing. Input file doesn't have fastq2 column.")
+
+    if platform_ == "nanopore" and "fastq2" in df_colnames:
+        warnings.warn("fastq2 will not be used for Nanopore sequencing analysis.")
+
+    if "host" not in df_colnames:
+        df["host"] = ""
+    if "outdir" not in df_colnames:
+        df["outdir"] = ""
+
+    arguments_list = []
+
+    for index, row in df.iterrows():
+        if platform_ == "illumina":
+            new_args = PseudoArgs(row["prefix"], row["outdir"], row["host"], row["fastq"], row["fastq2"])
+
         else:
-            args_dict = {}
-            args_dict["sequencing_type"] = args_.sequencing_type
-            args_dict["fastq"] = args_.fastq
-            if args_dict["sequencing_type"] == "illumina":
-                args_dict["fastq2"] = args_.fastq2
-            args_dict["prefix"] = args_.prefix
-            if args_.host and args_.host.lower() != "none" and get_host_reference_path(args_.host.lower()):
-                args_dict["host"] = '"' + args_.host.lower() + '"'
-                args_dict["host_reference_path"] = get_host_reference_path(args_.host.lower())
-            # if host not given, host filtering is not executed
-            if not args_.outdir:
-                args_dict["outdir"] = args_dict["prefix"]
-            self.args_dict_list.append(args_dict)
+            new_args = PseudoArgs(row["prefix"], row["outdir"], row["host"], row["fastq"])
+            
+        arguments = parse_one_input(platform_, new_args)
+        valid_check(arguments)
+        arguments_list.append(arguments)
 
-    def valid_check(self):
-        for args_dict in self.args_dict_list:
-            if "fastq" not in args_dict :
+    return arguments_list
+
+
+def valid_check(Arguments_):
+
+    if not Arguments_.fastq :
+        raise FastqError
+    else:
+        if not os.path.exists(Arguments_.fastq.strip('\"')):
+            raise FastqError
+    
+    if Arguments_.platform == "illumina":
+        if not Arguments_.fastq2:
+            raise FastqError
+        else:
+            if not os.path.exists(Arguments_.fastq2.strip('\"')):
                 raise FastqError
-            else:
-                if not args_dict["fastq"] or not os.path.exists(args_dict["fastq"].strip('\"')):
-                    raise FastqError
-            if args_dict["sequencing_type"] == "illumina":
-                if "fastq2" not in args_dict:
-                    raise FastqError
-                else:
-                    if not args_dict["fastq2"] or not os.path.exists(args_dict["fastq2"].strip('\"')):
-                        raise FastqError
-            else:
-                if "fastq2" in args_dict:
-                    warnings.warn("fastq2 will not be used for nanoporeseq analysis.")
 
-            if "prefix" not in args_dict or not args_dict["prefix"]:
-                raise PrefixError
+    if not Arguments_.prefix:
+        raise PrefixError
 
-    def parse_args_dict_to_cmd(self, args_dict_):
-        cmd = ""
-        cmd = nextflow_path + "nextflow run " + nextflow_script_path 
-        if args_dict_["sequencing_type"] == "illumina":
-            cmd = cmd + "main_illumina.nf "
-        else:
-            cmd = cmd + "main_nanopore.nf "
-        for key in (k for k in args_dict_.keys() if k != "seq_type"):
-            if not args_dict_[key]:
-                continue
-            cmd += "--" + key + " " + args_dict_[key] + " "
-        return cmd
+def parse_arguments_to_cmd(Arguments_):
+    cmd = ""
+    cmd = nextflow_path + "nextflow run " + nextflow_script_path 
+    if Arguments_.platform == "illumina":
+        cmd = cmd + "main_illumina.nf "
+    else:
+        cmd = cmd + "main_nanopore.nf "
+
+    cmd += "--prefix "                    + Arguments_.prefix + " "
+    cmd += "--outdir "                    + Arguments_.outdir + " "
+    if(Arguments_.host):
+        cmd += "--host "                  + "\"" + Arguments_.host + "\" "
+        cmd += "--host_reference_path "   + Arguments_.host_reference_path + " "
+    cmd += "--fastq "                     + Arguments_.fastq + " "
+
+    if Arguments_.platform == "illumina":
+        cmd += "--fastq2 "                + Arguments_.fastq2
+
     
-    def to_cmd_list(self):
-        cmd_list = []
-        for args_dict in self.args_dict_list:
-            cmd_list.append(self.parse_args_dict_to_cmd(args_dict))
-        return cmd_list
+    return cmd
     
-
 parser = argparse.ArgumentParser(description= 'Wrapper script for running pipeline')
 
-parser.add_argument('sequencing_type', choices=['nanopore', 'illumina', 'host'])
+parser.add_argument('platform', choices=['nanopore', 'illumina', 'host'])
 
 parser.add_argument('--inputs_from_file', '-f', metavar='file.txt',
         help='Get inputs from this text file. Column header corresponding to the options should be provided')
@@ -188,15 +246,25 @@ parser.add_argument('--test', action='store_true',
 
 args = parser.parse_args()
 
-if args.sequencing_type == "host":
+platform = args.platform
+if platform == "host":
     print('\n'.join(host_reference_dict.keys()))
     print('\nAbove are available host genomes.\nYou need to add to wrapper.py if you want to add new host genome.')
     exit()
 
-args_obj = Arguments(args)
-args_obj.valid_check()
+file_input = args.inputs_from_file
+if file_input:
+    arguments_list = parse_file_input(platform, file_input)
+else:
+    if args.prefix is None or args.fastq is None:
+        parser.error("At least --prefix and --fastq are required")
+    if args.platform == "illumina" and not args.fastq2:
+        sys.exit("Pipeline only supports paired-end Illumina sequencing. fastq2 is not given.")
+    if args.platform == "nanopore" and args.fastq2:
+        warnings.warn("fastq2 will not be used for Nanopore sequencing analysis.")
+    arguments_list = [ parse_one_input(platform, args) ]
 
-cmd_list = args_obj.to_cmd_list()
+cmd_list = [ parse_arguments_to_cmd(x) for x in arguments_list ]
 
 test = args.test
 background = args.background
@@ -208,6 +276,7 @@ for cmd in cmd_list :
     cmd += "" if test else (" -with-report " + curr_time  + "_nextflow_running_report.html" + " -with-trace " + curr_time + "_nextflow_trace_report.txt" + " -with-timeline " + curr_time + "_nextflow_timeline_report.html")
     cmd += " -bg " if background else ""
     cmd += " -resume " if resume else ""
-    subprocess.run(cmd, shell=True, check=True)
+    print(cmd)
+    #subprocess.run(cmd, shell=True, check=True)
 
 
