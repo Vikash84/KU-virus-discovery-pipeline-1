@@ -27,7 +27,7 @@ def is_valid_file(parser_, arg_):
         parser_.error("The file %s does not exist!" % arg_)
     return arg_
 
-def get_host_ref_path(host_):
+def get_host_reference_path(host_):
     """
     Recommend the closest host reference
     when wrong host name is given
@@ -87,9 +87,9 @@ class Arguments:
                         else:
                             args_dict[col_name] = '"' + li[index] + '"'
 
-                    if host and host.lower() != "none" and get_host_ref_path(host.lower()):
+                    if host and host.lower() != "none" and get_host_reference_path(host.lower()):
                         args_dict["host"] = '"' + host.lower() + '"'
-                        args_dict["host_ref_path"] = get_host_ref_path(host.lower())
+                        args_dict["host_reference_path"] = get_host_reference_path(host.lower())
                     # if host not given, host filtering is not executed
 
                     if not "outdir" in args_dict and "prefix" in args_dict:
@@ -105,9 +105,9 @@ class Arguments:
             if args_dict["sequencing_type"] == "illumina":
                 args_dict["fastq2"] = args_.fastq2
             args_dict["prefix"] = args_.prefix
-            if args_.host and args_.host.lower() != "none" and get_host_ref_path(args_.host.lower()):
+            if args_.host and args_.host.lower() != "none" and get_host_reference_path(args_.host.lower()):
                 args_dict["host"] = '"' + args_.host.lower() + '"'
-                args_dict["host_ref_path"] = get_host_ref_path(args_.host.lower())
+                args_dict["host_reference_path"] = get_host_reference_path(args_.host.lower())
             # if host not given, host filtering is not executed
             if not args_.outdir:
                 args_dict["outdir"] = args_dict["prefix"]

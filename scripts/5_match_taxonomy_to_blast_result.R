@@ -16,10 +16,13 @@ if (nrow(data)==0) {
   uniq_taxid <- unique(data$"TAXID")
 }
 
+# find out all taxons of appearing taxid
 all_taxons <- as.data.frame(getTaxonomy(uniq_taxid, args[3]))
 all_taxons <- tibble::rownames_to_column(all_taxons, "TAXID")
 all_taxons$TAXID <- as.integer(all_taxons$TAXID)
 
+# match taxon name to data
 taxon_mapped_data <- inner_join(data, all_taxons, by = "TAXID")
 
+# export table
 write.table(taxon_mapped_data, file = args[2], row.names=FALSE, col.names = TRUE, sep="\t", quote = FALSE)

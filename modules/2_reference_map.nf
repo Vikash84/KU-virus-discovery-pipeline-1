@@ -3,9 +3,9 @@ nextflow.enable.dsl=2
 
 workflow reference_map_illumina {
     take:
-        fastq
+        fastq_pair
     main:
-        bams = ref_mapping_illumina(fastq).filter{it.size()>1000}
+        bams = ref_mapping_illumina(fastq_pair).filter{it.size()>1000}
         map_info = mapping_summary(bams)
         collection = map_info[0].collectFile(name: "${params.prefix}_temp_colleciton.txt")
         summary_collection = add_header(collection)
@@ -15,7 +15,6 @@ workflow reference_map_illumina {
 workflow reference_map_nanopore {
     take:
         fastq
-
     main:
         bams = ref_mapping_nanopore(fastq).filter{it.size()>1000}
         map_info = mapping_summary(bams)
