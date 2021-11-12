@@ -58,8 +58,6 @@ process kraken2_illumina {
     """
     echo "Classify reads into taxonomy with Kraken2"
     echo "sample name: $params.prefix"
-    echo "input file 1: $pe1"
-    echo "input file 2: $pe2"
     echo "kraken db path: $params.kraken_db_path"
     kraken2 --db $params.kraken_db_path \
         --report ${params.prefix}.kraken_report.csv \
@@ -76,7 +74,6 @@ process kraken2_nanopore {
     """
     echo "Classify reads into taxonomy with Kraken2"
     echo "sample name: $params.prefix"
-    echo "query file: $fastq"
     echo "kraken db path: $params.kraken_db_path"
     kraken2 --db $params.kraken_db_path \
         --report ${params.prefix}.kraken_report.csv \
@@ -108,7 +105,6 @@ process kaiju_nanopore {
     """
     echo "Classify reads into taxonomy with Kaiju"
     echo "sample name: $params.prefix"
-    echo "query file: $fastq"
     echo "kaiju db path: $params.kaiju_db_path"
     kaiju -f $params.kaiju_db_path/kaiju_db_nr.fmi \
         -t $params.kaiju_db_path/nodes.dmp \

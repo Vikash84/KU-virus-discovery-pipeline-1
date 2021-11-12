@@ -69,8 +69,6 @@ process spades{
         path("${params.prefix}.spades.contigs.fasta") optional true
     """
     echo "De novo assembly with Spades"
-    echo "input file 1: $pe1"
-    echo "input file 2: $pe2"
     spades.py --pe1-1 $pe1 --pe1-2 $pe2 -o ${params.prefix} --meta -t 12
     mv "${params.prefix}/contigs.fasta" "${params.prefix}.spades.contigs.fasta"
     """
@@ -85,8 +83,24 @@ process megahit {
         path("${params.prefix}.megahit.contigs.fa") optional true
     """
     echo "De novo assembly with Megahit"
-    echo "input file: $fastq"
     megahit -r $fastq -o $params.prefix --out-prefix $params.prefix -t 12 
     mv ${params.prefix}/${params.prefix}.contigs.fa ${params.prefix}.megahit.contigs.fa
+    """
+}
+
+process canu {
+    errorStrategy { 'ignore' }
+    publishDir "${params.outdir}/assembly", mode: 'copy'
+    
+    input:
+        path fastq
+    output:
+        path("${params.prefix}.canu.contigs.fa") optional true
+    """
+    echo "De novo assembly with Canu"
+    canu -p $params.prefix -d $params.prefix -nanopore $fastq \
+    genomeSize = 5m minReadLength = 200 maxThreads=8\
+    corOutCoverage = 10000 corMhapSensitivity = high corMinCoverage = 0 \
+    redMemory = 32 oeaMemory = 32 batMemory = 200
     """
 }

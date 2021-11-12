@@ -1,4 +1,6 @@
 #! /usr/bin/perl -w
+# imported from https://github.com/LANL-Bioinformatics/EDGE/blob/master/scripts/microbial_profiling/script/convert_krakenRep2list.pl
+
 use strict;
 use lib (`ktGetLibPath`);
 use KronaTools;

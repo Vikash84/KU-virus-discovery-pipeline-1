@@ -20,7 +20,6 @@ process racon {
         path "${params.prefix}.polished_contigs.fasta"
     """
     echo "Contigs correction with Racon"
-    echo "input file: $contigs, $fastq"
     echo "Mapping reads onto contigs using Minimap2"
     minimap2 -x ava-ont $contigs $fastq \
         -t 24 > ${params.prefix}.paf
@@ -38,7 +37,6 @@ process medaka {
         path "${params.prefix}/${params.prefix}_consensus.fasta"
     """
     echo "Contigs polishing with Medaka"
-    echo "input file: $contigs, fastq"
     medaka_consensus -i $fastq -d $contigs \
          -o ${params.prefix} \
          -t 24 -m r941_min_high_g303
