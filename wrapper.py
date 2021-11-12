@@ -264,7 +264,6 @@ else:
 cmd_list = [ parse_arguments_to_cmd(x) for x in arguments_list ]
 
 test = args.test
-background = args.background
 resume = args.resume
 
 for i in range(len(cmd_list)) :
