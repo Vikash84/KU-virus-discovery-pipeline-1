@@ -76,7 +76,7 @@ process parseDiamondBlastx {
     input:
         path result
     output:
-        path "${params.prefix}.blastx.txt"
+        path "${params.prefix}.blastx.txt" optional true
     """
     cat ${params.nextflow_script_path}/headers/blast_header $result > ${result.baseName}.headered.tmp
     python ${params.nextflow_script_path}/scripts/5_blast_result_filter.py --input ${result.baseName}.headered.tmp --output ${result.baseName}.filtered.tmp --aln_len 33 --aln_contig_len_prop 0.17
