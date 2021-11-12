@@ -4,10 +4,10 @@
 ###############################################################
 
 suppressPackageStartupMessages(library("argparser"))
-require("Nozzle.R1");
-require("dplyr");
-require("data.table");
-require("DT");
+suppressPackageStartupMessages(library("Nozzle.R1"));
+suppressPackageStartupMessages(library("dplyr"));
+suppressPackageStartupMessages(library("data.table"));
+suppressPackageStartupMessages(library("DT"));
 
 pipeline_version <- "v2.0"
 
