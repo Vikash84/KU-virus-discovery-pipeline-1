@@ -8,8 +8,7 @@ workflow reference_map_illumina {
         bams = ref_mapping_illumina(fastq_pair).filter{it.size()>1000}
         map_info = mapping_summary(bams)
         collection = map_info[0].collectFile(name: "${params.prefix}_temp_colleciton.txt")
-        summary_collection = add_header(collection)
-        add_header_filter(summary_collection)
+        add_header_filter(collection)
 }
 
 workflow reference_map_nanopore {
@@ -19,8 +18,7 @@ workflow reference_map_nanopore {
         bams = ref_mapping_nanopore(fastq).filter{it.size()>1000}
         map_info = mapping_summary(bams)
         collection = map_info[0].collectFile(name: "${params.prefix}_temp_colleciton.txt")
-        summary_collection = add_header(collection)
-        add_header_filter(summary_collection)
+        add_header_filter(collection)
 }
 
 process ref_mapping_illumina {
