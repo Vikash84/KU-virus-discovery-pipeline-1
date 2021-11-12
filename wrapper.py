@@ -235,9 +235,6 @@ parser.add_argument('--outdir', '-d', metavar='dir',
 parser.add_argument('--host', metavar='host',
         help='Scientific name of host organism. Type "wrapper.py host" to get the list of avaible host names'),
 
-parser.add_argument('--background', '-bg', action='store_true',
-        help='Whether nextflow run in background or not')
-
 parser.add_argument('--resume', action='store_true',
         help='Whether nextflow resume the previous run')
 
@@ -276,7 +273,6 @@ for i in range(len(cmd_list)) :
     t = time.localtime()
     curr_time = time.strftime("%Y_%m_%d_%H_%M_%S", t)
     cmd += "" if test else (" -with-report " + curr_time  + "_nextflow_running_report.html" + " -with-trace " + curr_time + "_nextflow_trace_report.txt" + " -with-timeline " + curr_time + "_nextflow_timeline_report.html")
-    cmd += " -bg " if background else ""
     cmd += " -resume " if resume else ""
     subprocess.run(cmd, shell=True, check=True)
 
