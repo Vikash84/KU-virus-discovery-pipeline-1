@@ -15,6 +15,7 @@ host_reference_dir_path = "" # directory containing host reference sequences
 ####################################################################
 
 nextflow_script_path=os.path.dirname(os.path.realpath(__file__))+"/"
+scripts_path=nextflow_script_path+"/scripts"+"/"
 
 host_reference_dict = { 
 #              'rhinolophus ferrumequinum' : host_reference_dir_path + "/GCF_004115265.1_mRhiFer1_v1.p_genomic.fna.gz",  #bat
@@ -276,6 +277,6 @@ for i in range(len(cmd_list)) :
     subprocess.run(cmd, shell=True, check=True)
 
     prefix = arguments_list[i].prefix
-    report_cmd = "Rscript " + nextflow_script_path + "scripts/6_report_with_nozzle_" + platform + ".R --prefix " + prefix
+    report_cmd = "Rscript " + scripts_path + "6_report_with_nozzle_" + platform + ".R --prefix " + prefix
     subprocess.run(report_cmd, shell=True, check=True)
     
