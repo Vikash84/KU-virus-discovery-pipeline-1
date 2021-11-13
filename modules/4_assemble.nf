@@ -98,7 +98,7 @@ process canu {
     """
     echo "De novo assembly with Canu"
     canu -p $params.prefix -d $params.prefix -nanopore $fastq \
-    genomeSize=5m minReadLength=300 minOverlapLength=50 maxThreads=8 minInpuCoverage=0 \
+    genomeSize=5m minReadLength=300 minOverlapLength=50 maxThreads=12 minInpuCoverage=0 StopOnCoverage=0 \
     corOutCoverage=10000 corMhapSensitivity=high corMinCoverage=0 \
     redMemory=32 oeaMemory=32 batMemory=200
     """
