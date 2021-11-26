@@ -67,7 +67,7 @@ process mapping_summary {
         path "${bam.simpleName}.png" optional true
     """
     mkdir each_mapping
-    ${params.bamcov_path}/bamcov -H $bam > each_mapping/"${bam.simpleName}.txt"
+    bamcov -H $bam > each_mapping/"${bam.simpleName}.txt"
     qualimap bamqc -bam $bam -outdir qualimap_results
     mv qualimap_results/images_qualimapReport/genome_coverage_across_reference.png "${bam.simpleName}.png"
     """
