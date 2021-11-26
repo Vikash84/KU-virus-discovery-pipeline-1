@@ -6,8 +6,7 @@ workflow assemble_illumina {
     emit:
         contigs
     main:
-        spades_contigs = spades(fastq)
-        contigs = spades_contigs
+        contigs = spades(fastq)
         filtered_contigs = filterContigs_illumina(contigs)
         contigSummary(filtered_contigs)
         
@@ -19,7 +18,7 @@ workflow assemble_nanopore {
     emit:
         contigs
     main:
-        contigs = canu(fastq)
+        contigs = megahit(fastq)
         filtered_contigs = filterContigs_nanopore(contigs)
         contigSummary(filtered_contigs)
 }

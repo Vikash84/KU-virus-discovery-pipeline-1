@@ -15,7 +15,7 @@ host_reference_dir_path = "" # directory containing host reference sequences
 ####################################################################
 
 nextflow_script_path=os.path.dirname(os.path.realpath(__file__))+"/"
-scripts_path=nextflow_script_path+"/scripts"+"/"
+scripts_path=nextflow_script_path+"scripts"+"/"
 
 host_reference_dict = { 
 #              'rhinolophus ferrumequinum' : host_reference_dir_path + "/GCF_004115265.1_mRhiFer1_v1.p_genomic.fna.gz",  #bat
