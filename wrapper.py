@@ -10,23 +10,23 @@ import pandas as pd
 ####################################################################
 ###########             path should be given             ###########
 ####################################################################
-nextflow_path="" # nextflow binary path
-host_reference_dir_path = "" # directory containing host reference sequences
+nextflow_path           =   "/home/molecularvirology/miniconda2/envs/vdp_lrs/bin/nextflow"                          # nextflow binary path
+host_reference_dir_path =   "/media/molecularvirology/b6d973a5-06b6-4aae-9d77-bf28064b405e1/Kijin/host_reference"   # directory containing host reference sequences
 ####################################################################
 
 nextflow_script_path=os.path.dirname(os.path.realpath(__file__))+"/"
 scripts_path=nextflow_script_path+"scripts"+"/"
 
 host_reference_dict = { 
-#              'rhinolophus ferrumequinum' : host_reference_dir_path + "/GCF_004115265.1_mRhiFer1_v1.p_genomic.fna.gz",  #bat
-#              'pygoscelis antarctica' : host_reference_dir_path + "/GCA_010078415.1_BGI_Pant.V1_genomic.fna.gz",        #penguin
-#              'haemaphysalis longicornis' : host_reference_dir_path + "/GCA_010078415.1_BGI_Pant.V1_genomic.fna.gz",    #tick
-#              'homo sapiens' : host_reference_dir_path + "/GCF_000001405.39_GRCh38.p13_genomic.fna.gz",                 #human
-#              'apodemus agrarius' : host_reference_dir_path + "/NC_016428.1_Apodemus_agrarius_mitochondrion.fasta",     
-#              'apodemus peninsulae' : host_reference_dir_path + "/NC_016060.1_Apodemus_peninsulae_mitochondrion.fasta",
-#              'apodemus chejuensis' : host_reference_dir_path + "/NC_016662.1_Apodemus_chejuensis_mitochondrion.fasta",
-#              'tscherskia triton' : host_reference_dir_path + "/NC_013068.1_Tscherskia_triton_mitochondrion.fasta",
-#              'rattus norvegicus' : host_reference_dir_path + "/GCF_015227675.2_mRatBN7.2_genomic.fna.gz",
+              'rhinolophus ferrumequinum' : host_reference_dir_path + "/GCF_004115265.1_mRhiFer1_v1.p_genomic.fna.gz",  #bat
+              'pygoscelis antarctica' : host_reference_dir_path + "/GCA_010078415.1_BGI_Pant.V1_genomic.fna.gz",        #penguin
+              'haemaphysalis longicornis' : host_reference_dir_path + "/GCA_010078415.1_BGI_Pant.V1_genomic.fna.gz",    #tick
+              'homo sapiens' : host_reference_dir_path + "/GCF_000001405.39_GRCh38.p13_genomic.fna.gz",                 #human
+              'apodemus agrarius' : host_reference_dir_path + "/NC_016428.1_Apodemus_agrarius_mitochondrion.fasta",     
+              'apodemus peninsulae' : host_reference_dir_path + "/NC_016060.1_Apodemus_peninsulae_mitochondrion.fasta",
+              'apodemus chejuensis' : host_reference_dir_path + "/NC_016662.1_Apodemus_chejuensis_mitochondrion.fasta",
+              'tscherskia triton' : host_reference_dir_path + "/NC_013068.1_Tscherskia_triton_mitochondrion.fasta",
+              'rattus norvegicus' : host_reference_dir_path + "/GCF_015227675.2_mRatBN7.2_genomic.fna.gz",
                 }
 
 def is_valid_file(parser_, arg_):
@@ -70,39 +70,48 @@ class FastqError(ValueError):
 class HostNameError(ValueError):
     def __str__(self):
         return "invalid host name. Please check the argument '--host'!"
+
+class Arguments:
+    def __init__(self):
+        self.platform               =   ""
+        self.prefix                 =   ""
+        self.outdir                 =   ""
+        self.host                   =   ""
+        self.host_reference_path    =   ""
+        self.fastq                  =   ""
         
-class IlluminaArguments:
+class IlluminaArguments(Arguments):
     def __init__(self, prefix_, outdir_, host_, fastq_, fastq2_):
-        self.platform = "illumina"
-        self.prefix = prefix_
-        self.outdir = outdir_
+        self.platform               =   "illumina"
+        self.prefix                 =   prefix_
+        self.outdir                 =   outdir_
         
-        self.host = None
-        self.host_reference_path = None
+        self.host                   =   None
+        self.host_reference_path    =   None
 
         if host_:
-            host_reference_path = get_host_reference_path(host_)
+            host_reference_path     =   get_host_reference_path(host_)
             if host_reference_path:
-                self.host = host_
-                self.host_reference_path = host_reference_path
+                self.host                   =   host_
+                self.host_reference_path    =   host_reference_path
         
-        self.fastq = fastq_       
-        self.fastq2 = fastq2_
+        self.fastq                  =   fastq_       
+        self.fastq2                 =   fastq2_
 
-class NanoporeArguments:
+class NanoporeArguments(Arguments):
     def __init__(self, prefix_, outdir_, host_, fastq_):
-        self.platform = "nanopore"
-        self.prefix = prefix_
-        self.outdir = outdir_
+        self.platform               =   "nanopore"
+        self.prefix                 =   prefix_
+        self.outdir                 =   outdir_
 
-        self.host = None
-        self.host_reference_path = None
+        self.host                   =   None
+        self.host_reference_path    =   None
 
         if host_:
-            host_reference_path = get_host_reference_path(host_)
+            host_reference_path     =   get_host_reference_path(host_)
             if host_reference_path:
-                self.host = host_
-                self.host_reference_path = host_reference_path
+                self.host                   =   host_
+                self.host_reference_path    =   host_reference_path
 
         self.fastq = fastq_
 
@@ -172,7 +181,6 @@ def parse_file_input(platform_, file_input_):
 
     return arguments_list
 
-
 def valid_check(Arguments_):
 
     if not Arguments_.fastq :
@@ -193,7 +201,7 @@ def valid_check(Arguments_):
 
 def parse_arguments_to_cmd(Arguments_):
     cmd = ""
-    cmd = nextflow_path + "nextflow run " + nextflow_script_path 
+    cmd = nextflow_path + " run " + nextflow_script_path 
     if Arguments_.platform == "illumina":
         cmd = cmd + "main_illumina.nf "
     else:
@@ -212,6 +220,9 @@ def parse_arguments_to_cmd(Arguments_):
     
     return cmd
     
+
+# Take input parameters into parser
+
 parser = argparse.ArgumentParser(description= 'Wrapper script for running pipeline')
 
 parser.add_argument('platform', choices=['nanopore', 'illumina', 'host'])
@@ -247,7 +258,7 @@ args = parser.parse_args()
 platform = args.platform
 if platform == "host":
     print('\n'.join(host_reference_dict.keys()))
-    print('\nAbove are available host genomes.\nYou need to add to wrapper.py if you want to add new host genome.')
+    print('\nAbove are available host genomes.\nYou need to add the path to wrapper.py if you want to add new host genome.')
     exit()
 
 file_input = args.inputs_from_file
@@ -255,7 +266,7 @@ if file_input:
     arguments_list = parse_file_input(platform, file_input)
 else:
     if args.prefix is None or args.fastq is None:
-        parser.error("At least --prefix and --fastq are required")
+        parser.error("At least --prefix and --fastq sould be given.")
     if args.platform == "illumina" and not args.fastq2:
         sys.exit("Pipeline only supports paired-end Illumina sequencing. fastq2 is not given.")
     if args.platform == "nanopore" and args.fastq2:

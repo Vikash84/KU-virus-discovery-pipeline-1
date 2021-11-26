@@ -19,13 +19,6 @@ workflow qc_nanopore {
         nanoplot(fastq)
 }
 
-workflow qc_nanopore_filtered {
-    take:
-        filtered
-    main:
-        nanoplot_filtered(filtered)
-}
-
 process fastqc1 {
     input:
         path fastq
@@ -67,17 +60,5 @@ process nanoplot {
     """
     NanoPlot --fastq $fastq -p ${params.prefix}_ -o ${params.prefix}
     mv ${params.prefix}/* .
-    """
-}
-
-process nanoplot_filtered {
-    publishDir "${params.outdir}/qc", mode: 'copy'
-    input:
-        path fastq
-    output:
-        path "${params.prefix}_filtered_*"
-    """
-    NanoPlot --fastq $fastq -p ${params.prefix}_filtered_ -o ${params.prefix}_filtered
-    mv ${params.prefix}_filtered/* .
     """
 }
