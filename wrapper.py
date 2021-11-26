@@ -71,38 +71,47 @@ class HostNameError(ValueError):
     def __str__(self):
         return "invalid host name. Please check the argument '--host'!"
         
-class IlluminaArguments:
+class Arguments:
+    def __init__(self):
+        self.platform               =   ""
+        self.prefix                 =   ""
+        self.outdir                 =   ""
+        self.host                   =   ""
+        self.host_reference_path    =   ""
+        self.fastq                  =   ""
+        
+class IlluminaArguments(Arguments):
     def __init__(self, prefix_, outdir_, host_, fastq_, fastq2_):
-        self.platform = "illumina"
-        self.prefix = prefix_
-        self.outdir = outdir_
+        self.platform               =   "illumina"
+        self.prefix                 =   prefix_
+        self.outdir                 =   outdir_
         
-        self.host = None
-        self.host_reference_path = None
+        self.host                   =   None
+        self.host_reference_path    =   None
 
         if host_:
-            host_reference_path = get_host_reference_path(host_)
+            host_reference_path     =   get_host_reference_path(host_)
             if host_reference_path:
-                self.host = host_
-                self.host_reference_path = host_reference_path
+                self.host                   =   host_
+                self.host_reference_path    =   host_reference_path
         
-        self.fastq = fastq_       
-        self.fastq2 = fastq2_
+        self.fastq                  =   fastq_       
+        self.fastq2                 =   fastq2_
 
-class NanoporeArguments:
+class NanoporeArguments(Arguments):
     def __init__(self, prefix_, outdir_, host_, fastq_):
-        self.platform = "nanopore"
-        self.prefix = prefix_
-        self.outdir = outdir_
+        self.platform               =   "nanopore"
+        self.prefix                 =   prefix_
+        self.outdir                 =   outdir_
 
-        self.host = None
-        self.host_reference_path = None
+        self.host                   =   None
+        self.host_reference_path    =   None
 
         if host_:
-            host_reference_path = get_host_reference_path(host_)
+            host_reference_path     =   get_host_reference_path(host_)
             if host_reference_path:
-                self.host = host_
-                self.host_reference_path = host_reference_path
+                self.host                   =   host_
+                self.host_reference_path    =   host_reference_path
 
         self.fastq = fastq_
 
@@ -211,6 +220,8 @@ def parse_arguments_to_cmd(Arguments_):
 
     
     return cmd
+
+# Take input parameters into parser
     
 parser = argparse.ArgumentParser(description= 'Wrapper script for running pipeline')
 
@@ -247,7 +258,7 @@ args = parser.parse_args()
 platform = args.platform
 if platform == "host":
     print('\n'.join(host_reference_dict.keys()))
-    print('\nAbove are available host genomes.\nYou need to add to wrapper.py if you want to add new host genome.')
+    print('\nAbove are available host genomes.\nYou need to add the path to wrapper.py if you want to add new host genome.')
     exit()
 
 file_input = args.inputs_from_file
@@ -255,7 +266,7 @@ if file_input:
     arguments_list = parse_file_input(platform, file_input)
 else:
     if args.prefix is None or args.fastq is None:
-        parser.error("At least --prefix and --fastq are required")
+        parser.error("At least --prefix and --fastq sould be given.")
     if args.platform == "illumina" and not args.fastq2:
         sys.exit("Pipeline only supports paired-end Illumina sequencing. fastq2 is not given.")
     if args.platform == "nanopore" and args.fastq2:
