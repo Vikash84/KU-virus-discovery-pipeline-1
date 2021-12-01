@@ -65,4 +65,4 @@ process nanoplot {
     NanoPlot --fastq $fastq -p ${params.prefix}_ -o ${params.prefix}
     mv ${params.prefix}/* .
     """
-}sssssssssssssssssssssssssssssssss
+}
