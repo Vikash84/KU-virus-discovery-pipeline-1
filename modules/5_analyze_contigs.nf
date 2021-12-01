@@ -18,7 +18,7 @@ workflow analyze_contigs {
 }
 
 process blastn {
-    
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     input:
         path contigs
     output:
@@ -32,6 +32,7 @@ process blastn {
 }
 
 process diamondBlastx {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
 
     input:
         path contigs
@@ -43,6 +44,7 @@ process diamondBlastx {
 }
 
 process parseBlastn {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_srs'
     errorStrategy 'ignore'
     publishDir "${params.outdir}/analysis", mode: 'copy'
 
@@ -58,6 +60,7 @@ process parseBlastn {
 }
 
 process parseMegaBlast {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_srs'
     errorStrategy 'ignore'
     publishDir "${params.outdir}/analysis", mode: 'copy'
 
@@ -73,6 +76,7 @@ process parseMegaBlast {
 }
 
 process parseDiamondBlastx {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_srs'
     errorStrategy 'ignore'
     publishDir "${params.outdir}/analysis", mode: 'copy'
 
@@ -88,6 +92,7 @@ process parseDiamondBlastx {
 }
 
 process prodigalAndParse {
+    conda '/home/molecularvirology/miniconda2/envs/zoonotic_rank'
     input:
         path contigs
     output:
@@ -99,6 +104,7 @@ process prodigalAndParse {
 }
 
 process zoonticRank {
+    conda '/home/molecularvirology/miniconda2/envs/zoonotic_rank'
     publishDir "${params.outdir}/analysis", mode: 'copy'
     
     input:

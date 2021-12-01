@@ -26,6 +26,7 @@ workflow assemble_nanopore {
 }
 
 process filterContigs_illumina {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     publishDir "${params.outdir}/assembly", mode: 'copy'
 
     input:
@@ -38,7 +39,7 @@ process filterContigs_illumina {
 }
 
 process filterContigs_nanopore {
-
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     input:
         path contigs
     output:
@@ -60,6 +61,7 @@ process renameContigs {
 }
 
 process contigLen {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     publishDir "${params.outdir}/assembly", mode: 'copy'
     input:
         path contigs
@@ -71,6 +73,7 @@ process contigLen {
 }
 
 process spades{
+    conda '/home/molecularvirology/miniconda2/envs/vdp_srs'
     errorStrategy { 'ignore' }
     input:
         tuple path(pe1), path(pe2)
@@ -84,6 +87,7 @@ process spades{
 }
 
 process megahit {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     errorStrategy { 'ignore' }
     publishDir "${params.outdir}/assembly", mode: 'copy'
     input:
@@ -98,6 +102,7 @@ process megahit {
 }
 
 process canu {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     errorStrategy { 'ignore' }
     publishDir "${params.outdir}/assembly", mode: 'copy'
     

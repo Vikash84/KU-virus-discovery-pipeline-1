@@ -22,6 +22,7 @@ workflow reference_mapping_nanopore {
 }
 
 process reference_mapping_illumina {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_srs'
     errorStrategy 'ignore'
     stageInMode "link"
 
@@ -40,6 +41,7 @@ process reference_mapping_illumina {
 }
 
 process reference_mapping_nanopore {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
 
     input:
         path(fastq)
@@ -57,6 +59,7 @@ process reference_mapping_nanopore {
 }
 
 process mapping_summary {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     publishDir "${params.outdir}/mapping/details", mode: 'copy'
     errorStrategy 'ignore'
     stageInMode 'link'
@@ -73,6 +76,7 @@ process mapping_summary {
 }
 
 process add_header_filter {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     publishDir "${params.outdir}/mapping", mode: 'copy'
 
     input:

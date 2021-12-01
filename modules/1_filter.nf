@@ -53,7 +53,7 @@ process decompress_fastq {
 }
 
 process deduplication {
-
+    conda '/home/molecularvirology/miniconda2/envs/vdp_srs'
     input:
         tuple path(pe1), path(pe2)
     output:
@@ -65,6 +65,7 @@ process deduplication {
 }
 
 process trimmomatic {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_srs'
     input:
         tuple path(pe1), path(pe2)
     output:
@@ -80,6 +81,7 @@ process trimmomatic {
 }
 
 process nanofilt {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     input:
         path fastq
     output:
@@ -95,6 +97,7 @@ process nanofilt {
 }
 
 process hostfilter_illumina {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_srs'
 
     input:
         tuple path(pe1), path(pe2)
@@ -111,6 +114,7 @@ process hostfilter_illumina {
 }
 
 process hostfilter_nanopore {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
 
     publishDir "${params.outdir}/filter", mode: 'copy'
     

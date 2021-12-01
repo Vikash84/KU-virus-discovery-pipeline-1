@@ -24,7 +24,7 @@ workflow classify_reads_nanopore {
 }
 
 process kreport2EDGEform {
-
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     input:
         path kraken_report
     output:
@@ -36,6 +36,7 @@ process kreport2EDGEform {
 }
 
 process EDGEform2heatmap {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     publishDir "${params.outdir}/classification", mode: 'copy'
 
     input:
@@ -51,6 +52,7 @@ process EDGEform2heatmap {
 }
 
 process kraken2_illumina {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     input:
         tuple path(pe1), path(pe2)
     output:
@@ -67,6 +69,7 @@ process kraken2_illumina {
 }
 
 process kraken2_nanopore {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     input:
         path fastq
     output:
@@ -83,6 +86,7 @@ process kraken2_nanopore {
 }
 
 process kreport2krona {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     publishDir "${params.outdir}/classification", mode: 'copy'
     input:
         path kraken_report
@@ -97,6 +101,7 @@ process kreport2krona {
 }
 
 process kaiju_nanopore {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     publishDir "${params.outdir}/classification", mode: 'copy'
     input:
         path fastq
@@ -117,6 +122,7 @@ process kaiju_nanopore {
 }
 
 process kaiju2krona {
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     publishDir "${params.outdir}/classification", mode: 'copy'
     input:
         path kaiju_krona
