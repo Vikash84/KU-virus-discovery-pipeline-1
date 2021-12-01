@@ -4,11 +4,12 @@ workflow assemble_illumina {
     take:
         fastq
     emit:
-        contigs
+        renamed_contigs
     main:
         contigs = spades(fastq)
         filtered_contigs = filterContigs_illumina(contigs)
-        contigSummary(filtered_contigs)
+        renamed_contigs = renameContigs(filtered_contigs)
+        contigSummary(renamed_contigs)
         
 }
 
@@ -16,11 +17,12 @@ workflow assemble_nanopore {
     take:
         fastq
     emit:
-        contigs
+        renamed_contigs
     main:
         contigs = megahit(fastq)
         filtered_contigs = filterContigs_nanopore(contigs)
-        contigSummary(filtered_contigs)
+        renamed_contigs = renameContigs(filtered_contigs)
+        contigSummary(renamed_contigs)
 }
 
 process filterContigs_illumina {
@@ -36,7 +38,6 @@ process filterContigs_illumina {
 }
 
 process filterContigs_nanopore {
-    publishDir "${params.outdir}/assembly", mode: 'copy'
 
     input:
         path contigs
@@ -47,15 +48,25 @@ process filterContigs_nanopore {
     """
 }
 
-process contigSummary {
+process renameContigs {
     publishDir "${params.outdir}/assembly", mode: 'copy'
     input:
         path contigs
     output:
-        path "${params.prefix}.contig_summary.txt"
-        path "${params.prefix}.contigs_length_histogram.png"
+        path("${params.prefix}.contigs.fasta")
     """
-    python ${params.nextflow_script_path}/scripts/4_contig_summary_statistics.py $params.prefix $contigs
+    awk '/^/{print ">tig" ++i; next}{print}' < $contigs > "${params.prefix}.contigs.fasta"
+    """
+}
+
+process contigLen {
+    publishDir "${params.outdir}/assembly", mode: 'copy'
+    input:
+        path contigs
+    output:
+        path "${params.prefix}.contigs.len"
+    """
+    python ${params.nextflow_script_path}/scripts/4_contigs_length.py $params.prefix $contigs
     """
 }
 

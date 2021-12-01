@@ -1,27 +1,27 @@
 nextflow.enable.dsl=2
 
 
-workflow reference_map_illumina {
+workflow reference_mapping_illumina {
     take:
         fastq_pair
     main:
-        bams = ref_mapping_illumina(fastq_pair).filter{it.size()>1000}
-        map_info = mapping_summary(bams)
-        collection = map_info[0].collectFile(name: "${params.prefix}_temp_colleciton.txt")
+        bams = reference_mapping_illumina(fastq_pair).filter{it.size()>1000}
+        mapping_summaries = mapping_summary(bams)
+        collection = mapping_summaries[0].collectFile(name: "${params.prefix}_temp_colleciton.txt")
         add_header_filter(collection)
 }
 
-workflow reference_map_nanopore {
+workflow reference_mapping_nanopore {
     take:
         fastq
     main:
-        bams = ref_mapping_nanopore(fastq).filter{it.size()>1000}
-        map_info = mapping_summary(bams)
-        collection = map_info[0].collectFile(name: "${params.prefix}_temp_colleciton.txt")
+        bams = reference_mapping_nanopore(fastq).filter{it.size()>1000}
+        mapping_summaries = mapping_summary(bams)
+        collection = mapping_summaries[0].collectFile(name: "${params.prefix}_temp_colleciton.txt")
         add_header_filter(collection)
 }
 
-process ref_mapping_illumina {
+process reference_mapping_illumina {
     errorStrategy 'ignore'
     stageInMode "link"
 
@@ -39,7 +39,7 @@ process ref_mapping_illumina {
     """
 }
 
-process ref_mapping_nanopore {
+process reference_mapping_nanopore {
 
     input:
         path(fastq)
@@ -57,19 +57,18 @@ process ref_mapping_nanopore {
 }
 
 process mapping_summary {
+    publishDir "${params.outdir}/mapping/details", mode: 'copy'
     errorStrategy 'ignore'
     stageInMode 'link'
 
     input:
         path bam
     output:
-        path "each_mapping/${bam.simpleName}.txt"
-        path "${bam.simpleName}.png" optional true
+        path "${bam.simpleName}.txt"
+        path "${bam.simpleName}/*"
     """
-    mkdir each_mapping
-    ${params.bamcov_path}/bamcov -H $bam > each_mapping/"${bam.simpleName}.txt"
-    qualimap bamqc -bam $bam -outdir qualimap_results
-    mv qualimap_results/images_qualimapReport/genome_coverage_across_reference.png "${bam.simpleName}.png"
+    ${params.bamcov_path}/bamcov -H $bam > "${bam.simpleName}_mapping_summary.txt"
+    qualimap bamqc -bam $bam -outdir ${bam.simpleName}
     """
 }
 
@@ -79,10 +78,10 @@ process add_header_filter {
     input:
         path collection
     output:
-        path "${params.prefix}.reference_mapping_collection.txt"
+        path "${params.prefix}.reference_mapping.txt"
     
     """
     cat ${params.nextflow_script_path}/headers/bamcov_header $collection > ${params.prefix}.tmp
-    python ${params.nextflow_script_path}/scripts/2_reference_map_result_filter.py --input ${params.prefix}.tmp --output ${params.prefix}.reference_mapping_collection.txt --min_avg_cov ${params.reference_mapping_minimum_avg_coverage}
+    python ${params.nextflow_script_path}/scripts/2_reference_mapping_result_filter.py --input ${params.prefix}.tmp --output ${params.prefix}.reference_mapping.txt --min_avg_cov ${params.reference_mapping_minimum_avg_coverage}
     """
 }

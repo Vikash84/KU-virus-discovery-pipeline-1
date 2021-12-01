@@ -99,7 +99,7 @@ if(is.na(args$multiqc_html)){
 # reference mapping data
 
 if(is.na(args$mapping_summary)){
-  ref_map_summary_file <- paste(prefix, "/mapping/", prefix, ".filtered_reference_mapping_collection.txt", sep="")
+  ref_map_summary_file <- paste(prefix, "/mapping/", prefix, ".filtered_reference_mapping.txt", sep="")
 } else{
   ref_map_summary_file <- args$mapping_summary
 }

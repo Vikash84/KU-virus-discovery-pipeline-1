@@ -1,0 +1,231 @@
+---
+title: "`r params$prefix` KU Virus Discovery Pipeline Analysis Report"
+output: html_document
+params:
+  version: "v2.0"
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo=FALSE)
+```
+
+```{r message=FALSE, warning=FALSE}
+library("dplyr")
+library("data.table")
+library("DT")
+```
+
+```{r}
+# --- Parsing functions ---
+ref_map_to_table <- function(text_file) {
+  ret <- read.table(text_file, header = TRUE, sep = "", strip.white = TRUE)
+  ret <- select(ret, -c("N_COVERED_BASES", "AVG_BASEQ", "AVG_MAPQ"))
+  return(ret)
+}
+
+blast_to_table <- function(text_file) {
+  ret <- read.table(text_file, header = TRUE, sep = "\t", strip.white = TRUE, quote="", fill = TRUE)
+  ret$BITSCORE <- as.integer(ret$BITSCORE)
+  ret$TAXID <- as.factor(ret$TAXID)
+  ret$superkingdom <- as.factor(ret$superkingdom)
+  ret$phylum <- as.factor(ret$phylum)
+  ret$class <- as.factor(ret$class)
+  ret$order <- as.factor(ret$order)
+  ret$family <- as.factor(ret$family)
+  ret$genus <- as.factor(ret$genus)
+  ret$species <- as.factor(ret$species)
+  return(ret)
+}
+
+uniq_ref_species <- function(blast_table) {
+  ret <- blast_table[order(-blast_table$"BITSCORE"),]
+  ret$species <- as.character(ret$species)
+  ret <- ret[!duplicated(ret[ , "species"]), ]
+  cnt <- as.data.frame(table(blast_table$"species"))
+  colnames(cnt) <- c("species", "NUM_CONTIGS")
+
+  ret <- inner_join(ret, cnt, by = "species")
+  ret <- ret[c("NUM_CONTIGS", "species", "PER_IDENT", "EVALUE", "BITSCORE")]
+  ret <- ret[order(-ret$"BITSCORE"),]
+  ret$species <- as.factor(ret$species)
+  colnames(ret) <- c("NUM_CONTIGS", "REF_SPECIES", "BEST_PER_IDENT", "BEST_EVALUE", "BEST_BITSCORE")
+  return(ret)
+}
+
+# --- Input Data ---
+prefix <- params$prefix
+
+# QC file
+qc_link <- params$qc_link
+
+# reference mapping data
+if(file.exists(params$ref_map_summary_file)){
+  ref_map_summary_table <- ref_map_to_table(params$ref_map_summary_file)
+} else {
+  ref_map_summary_table <- data.table()
+}
+
+# classification heatmap image files
+classification_order_heatmap_file <- paste(params$classification_base_dir_path, "/", prefix, "_order.svg", sep = "")
+classification_family_heatmap_file <- paste(params$classification_base_dir_path, "/", prefix, "_family.svg", sep = "")
+classification_genus_heatmap_file <- paste(params$classification_base_dir_path, "/", prefix, "_genus.svg", sep = "")
+classification_species_heatmap_file <- paste(params$classification_base_dir_path, "/", prefix, "_species.svg", sep = "")
+
+# contigs file
+if(file.exists(contigs_len_file)){
+  contigs_len <- read.table(params$contigs_len_file, col.names=c("length"))
+}
+else{
+  contigs_len <- vector()
+}
+
+# blast data
+if(file.exists(params$blast_blastn_file)){
+  blast_blastn_table <- blast_to_table(params$blast_blastn_file)
+  blast_uniq_blastn_table <- uniq_ref_species(blast_blastn_table)
+}
+else{
+  blast_uniq_blastn_table <- data.frame()
+}
+if(file.exists(params$blast_megablast_file)){
+  blast_megablast_table <- blast_to_table(params$blast_megablast_file)
+  blast_uniq_megablast_table <- uniq_ref_species(blast_megablast_table)
+}
+else{
+  blast_uniq_megablast_table <- data.frame()
+}
+if(file.exists(params$blast_blastx_file)){
+  blast_blastx_table <- blast_to_table(params$blast_blastx_file)
+  blast_uniq_blastx_table <- uniq_ref_species(blast_blastx_table)
+}
+else{
+  blast_uniq_blastx_table <- data.frame()
+}
+
+# subset blast data and save as widgets
+table_header_order <- c("superkingdom", "phylum", "class", "order", "family", "genus", "species", "TAXID", "REF_ID", "REF_TITLE", "QUERY_ID", "REF_ID", "EVALUE", "BITSCORE", "PER_IDENT", "QUERY_LEN", "ALN_LEN", "MISMATCH", "GAPOPEN", "QSTART", "QEND", "REFSTART", "REFEND")
+if(file.exists(params$blast_blastn_file)){
+  blast_blastn_table <- blast_blastn_table[, table_header_order]
+  blastn_datatable <- datatable(blast_blastn_table,
+                                filter = 'top', 
+                                extensions = 'Buttons', 
+                                options = list(pageLength = 20,
+                                              autoWidth = TRUE,
+                                              paging = TRUE,
+                                                searching = TRUE,
+                                                fixedColumns = TRUE,
+                                                ordering = TRUE,
+                                                dom = 'tB',
+                                                buttons = c('copy', 'csv', 'excel')),
+                                class = 'display')
+  blastn_html_link <- paste("analysis/", prefix, ".full_blastn_table.html", sep = "")
+  saveWidget(blastn_datatable, paste(getwd(),"/",prefix,"/",blastn_html_link, sep=""))
+}
+else{
+  blastn_html_link <- ""
+}
+if(file.exists(params$blast_megablast_file)){
+  blast_megablast_table <- blast_megablast_table[, table_header_order]
+  megablast_datatable <- datatable(blast_megablast_table, 
+                                  filter = 'top', 
+                                  extensions = 'Buttons', 
+                                  options = list(pageLength = 20,
+                                                  autoWidth = TRUE,
+                                                  paging = TRUE,
+                                                  searching = TRUE,
+                                                  fixedColumns = TRUE,
+                                                  ordering = TRUE,
+                                                  dom = 'tB',
+                                                  buttons = c('copy', 'csv', 'excel')),
+                                  class = 'display')
+  megablast_html_link <- paste("analysis/", prefix, ".full_megablast_table.html", sep = "")
+  saveWidget(megablast_datatable, paste(getwd(),"/",prefix,"/", megablast_html_link, sep=""))
+}
+else{
+  megablast_html_link <- ""
+}
+if(file.exists(params$blast_blastx_file)){
+  blast_blastx_table <- blast_blastx_table[, table_header_order]
+  blastx_datatable <- datatable(blast_blastx_table,
+                                filter = 'top', 
+                                extensions = 'Buttons', 
+                                options = list(pageLength = 20,
+                                              autoWidth = TRUE,
+                                              paging = TRUE,
+                                                searching = TRUE,
+                                                fixedColumns = TRUE,
+                                                ordering = TRUE,
+                                                dom = 'tB',
+                                                buttons = c('copy', 'csv', 'excel')),
+                                class = 'display')
+  blastx_html_link <- paste("analysis/", prefix, ".full_blastx_table.html", sep = "")
+  saveWidget(blastx_datatable, paste(getwd(),"/",prefix,"/", blastx_html_link, sep=""))
+}
+else{
+  blastx_html_link <- ""
+}
+```
+
+A report that displays the results generated from KU Virus Discovery Pipeline `r params$version`.
+
+This report contains the analysis result of the Nanopore sequencing throughput originated from the sample named **`r prefix`**.
+
+## Results
+### QC
+
+QC result of the given input fastq file. The independent report produced with NanoPlot is linked [here](`r qc_link`).
+
+### Reference Mapping
+```{r}
+knitr::kable(ref_map_summary_table, caption = 'Column follows bamcov format.')
+```
+
+### Read classification
+```{r, fig.align='center', fig.cap='Order-level heatmap'}
+knitr::include_graphics(classification_order_heatmap_file)
+```
+```{r, fig.align='center', fig.cap='Family-level heatmap'}
+knitr::include_graphics(classification_family_heatmap_file)
+```
+```{r, fig.align='center', fig.cap='Genus-level heatmap'}
+knitr::include_graphics(classification_genus_heatmap_file)
+```
+```{r, fig.align='center', fig.cap='Species-level heatmap'}
+knitr::include_graphics(classification_species_heatmap_file)
+```
+
+The piechart generated from Kraken result is linked [here](`r classification_kraken_link`).
+
+The piechart generated from Kaiju result is linked [here](`r classification_kaiju_link`).
+
+### Assembly
+```{r}
+ggplot(contigs_len, aes(x=length))+
+  geom_histogram(color="darkblue", fill="lightblue") + 
+  geom_vline(aes(xintercept=mean(length)),
+            color="blue", linetype="dashed", size=1)
+```
+
+The histogram shows the length distribution of the assembled contigs. Dashed line indicates the mean length of them.
+
+### Contigs analysis
+#### BLAST
+##### BLASTn
+```{r}
+knitr::kable(blast_uniq_blastn_table)
+```
+More functional table is linked [here](`r blastn_html_link`).
+
+##### megaBLAST
+```{r}
+knitr::kable(blast_uniq_megablast_table)
+```
+More functional table is linked [here](`r megablast_html_link`).
+
+##### Diamond(BLASTx)
+```{r}
+knitr::kable(blast_uniq_blastx_table)
+```
+More functional table is linked [here](`r blastx_html_link`).
+
+#### Zoonotic Rank

@@ -1,7 +1,7 @@
 nextflow.enable.dsl=2
 include { qc_nanopore; qc_nanopore_filtered } from './modules/0_qc'
 include { filter_nanopore } from './modules/1_filter'
-include { reference_map_nanopore } from './modules/2_reference_map'
+include { reference_mapping_nanopore } from './modules/2_reference_mapping'
 include { classify_reads_nanopore } from './modules/3_classify_reads'
 include { assemble_nanopore } from './modules/4_assemble'
 include { polish } from './modules/4_2_polish'
@@ -12,7 +12,7 @@ if(params.help) {
     log.info 'KU virus discovery pipeline - long read (Nanopore) version'
     log.info ''
     log.info 'Usage: '
-    log.info '    nextflow run main.nf [options]'
+    log.info '    nextflow run main_nanopore.nf [options]'
     log.info ''
     log.info 'Script Options: '
     log.info '    --fastq               FILE    Path to FASTQ file'
@@ -37,7 +37,7 @@ workflow {
         filtered = filter_nanopore(fastq)
 
         // reference mapping with provided virus sequence lists
-        reference_map_nanopore(filtered)
+        reference_mapping_nanopore(filtered)
 
         // read taxon classification
         classify_reads_nanopore(filtered)
