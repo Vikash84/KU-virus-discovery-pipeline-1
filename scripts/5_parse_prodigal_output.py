@@ -49,5 +49,5 @@ with open(args.input) as f:
             entry = Entry(seq_name, cord_start, cord_end, direction)
             df = df.append(entry.retrieve_as_pd_entry(), ignore_index=True)
 
-df.columns = ['Name','SequenceID','CodingStart','CodingStop']
+df = df.rename(columns={'name':'Name','id':'SequenceID','start':'CodingStart','end':'CodingStop'})
 df.to_csv(args.output, index=False)

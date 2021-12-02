@@ -103,7 +103,7 @@ process prodigalAndParse {
     """
 }
 
-process zoonticRank {
+process zoonoticRank {
     conda '/home/molecularvirology/miniconda2/envs/zoonotic_rank'
     publishDir "${params.outdir}/analysis", mode: 'copy'
     
@@ -113,6 +113,6 @@ process zoonticRank {
     output:
         path "zoonotic_rank/*"
     """
-    Rscript ${params.nextflow_script_path}/scripts/6_PredictNovel.R fasta $contigs $metadata zoonotic_rank
+    Rscript ${params.nextflow_script_path}/scripts/6_PredictNovel.R fasta $contigs $metadata zoonotic_rank/${params.prefix} --script_path ${params.zoonotic_rank_dir}
     """
 }

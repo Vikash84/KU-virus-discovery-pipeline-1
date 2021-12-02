@@ -24,7 +24,7 @@ workflow classify_reads_nanopore {
 }
 
 process kreport2EDGEform {
-    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
+    conda '/home/molecularvirology/miniconda2/envs/vdp_srs'
     input:
         path kraken_report
     output:
@@ -36,7 +36,7 @@ process kreport2EDGEform {
 }
 
 process EDGEform2heatmap {
-    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
+    conda '/home/molecularvirology/miniconda2/envs/vdp_srs'
     publishDir "${params.outdir}/classification", mode: 'copy'
 
     input:

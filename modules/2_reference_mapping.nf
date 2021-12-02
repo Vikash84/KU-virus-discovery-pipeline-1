@@ -5,7 +5,7 @@ workflow reference_mapping_illumina {
     take:
         fastq_pair
     main:
-        bams = reference_mapping_illumina(fastq_pair).filter{it.size()>1000}
+        bams = mapping_illumina(fastq_pair).flatten().filter{it.size()>1000}
         mapping_summaries = mapping_summary(bams)
         collection = mapping_summaries[0].collectFile(name: "${params.prefix}_temp_colleciton.txt")
         add_header_filter(collection)
@@ -15,13 +15,13 @@ workflow reference_mapping_nanopore {
     take:
         fastq
     main:
-        bams = reference_mapping_nanopore(fastq).filter{it.size()>1000}
+        bams = mapping_nanopore(fastq).flatten().filter{it.size()>1000}
         mapping_summaries = mapping_summary(bams)
         collection = mapping_summaries[0].collectFile(name: "${params.prefix}_temp_colleciton.txt")
         add_header_filter(collection)
 }
 
-process reference_mapping_illumina {
+process mapping_illumina {
     conda '/home/molecularvirology/miniconda2/envs/vdp_srs'
     errorStrategy 'ignore'
     stageInMode "link"
@@ -40,7 +40,7 @@ process reference_mapping_illumina {
     """
 }
 
-process reference_mapping_nanopore {
+process mapping_nanopore {
     conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
 
     input:
@@ -70,7 +70,7 @@ process mapping_summary {
         path "${bam.simpleName}.txt"
         path "${bam.simpleName}/*"
     """
-    ${params.bamcov_path}/bamcov -H $bam > "${bam.simpleName}_mapping_summary.txt"
+    ${params.bamcov_path}/bamcov -H $bam > "${bam.simpleName}.txt"
     qualimap bamqc -bam $bam -outdir ${bam.simpleName}
     """
 }

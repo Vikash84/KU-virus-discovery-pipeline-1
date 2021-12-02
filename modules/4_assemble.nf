@@ -9,7 +9,7 @@ workflow assemble_illumina {
         contigs = spades(fastq)
         filtered_contigs = filterContigs_illumina(contigs)
         renamed_contigs = renameContigs(filtered_contigs)
-        contigSummary(renamed_contigs)
+        contigLen(renamed_contigs)
         
 }
 
@@ -22,7 +22,7 @@ workflow assemble_nanopore {
         contigs = megahit(fastq)
         filtered_contigs = filterContigs_nanopore(contigs)
         renamed_contigs = renameContigs(filtered_contigs)
-        contigSummary(renamed_contigs)
+        contigLen(renamed_contigs)
 }
 
 process filterContigs_illumina {
@@ -56,7 +56,7 @@ process renameContigs {
     output:
         path("${params.prefix}.contigs.fasta")
     """
-    awk '/^/{print ">tig" ++i; next}{print}' < $contigs > "${params.prefix}.contigs.fasta"
+    awk '/>/{print ">tig" ++i; next}{print}' < $contigs > "${params.prefix}.contigs.fasta"
     """
 }
 

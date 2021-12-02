@@ -1,5 +1,5 @@
 nextflow.enable.dsl=2
-include { qc_nanopore; qc_nanopore_filtered } from './modules/0_qc'
+include { qc_nanopore } from './modules/0_qc'
 include { filter_nanopore } from './modules/1_filter'
 include { reference_mapping_nanopore } from './modules/2_reference_mapping'
 include { classify_reads_nanopore } from './modules/3_classify_reads'

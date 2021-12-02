@@ -3,6 +3,17 @@ title: "`r params$prefix` KU Virus Discovery Pipeline Analysis Report"
 output: html_document
 params:
   version: "v2.0"
+  prefix: ""
+  qc_link: ""
+  ref_map_summary_file: ""
+  classification_base_dir_path: ""
+  classification_kraken_link: ""
+  classification_kaiju_link: ""
+  contigs_len_file: ""
+  blast_blastn_file: ""
+  blast_megablast_file: ""
+  blast_blastx_file: ""
+  zoonotic_rank_predictions_file: ""
 ---
 
 ```{r include=FALSE}
@@ -13,6 +24,7 @@ knitr::opts_chunk$set(echo=FALSE)
 library("dplyr")
 library("data.table")
 library("DT")
+library("ggplot2")
 ```
 
 ```{r}
@@ -52,6 +64,17 @@ uniq_ref_species <- function(blast_table) {
   return(ret)
 }
 
+zoonotic_rank_to_table <- function(text_file) {
+  ret <- read.csv(text_file)
+  ret <- ret[c("Name", "priority_category")]
+  colnames(ret) <- c("NAME", "ZOONOTIC POTENTIAL")
+  return(ret)
+}
+
+include_graphics = function(...) {
+  knitr::include_graphics(..., error = FALSE)
+}
+
 # --- Input Data ---
 prefix <- params$prefix
 
@@ -72,34 +95,37 @@ classification_genus_heatmap_file <- paste(params$classification_base_dir_path, 
 classification_species_heatmap_file <- paste(params$classification_base_dir_path, "/", prefix, "_species.svg", sep = "")
 
 # contigs file
-if(file.exists(contigs_len_file)){
+if(file.exists(params$contigs_len_file)){
   contigs_len <- read.table(params$contigs_len_file, col.names=c("length"))
-}
-else{
-  contigs_len <- vector()
+} else{
+  contigs_len <- data.frame()
 }
 
 # blast data
 if(file.exists(params$blast_blastn_file)){
   blast_blastn_table <- blast_to_table(params$blast_blastn_file)
   blast_uniq_blastn_table <- uniq_ref_species(blast_blastn_table)
-}
-else{
+} else{
   blast_uniq_blastn_table <- data.frame()
 }
 if(file.exists(params$blast_megablast_file)){
   blast_megablast_table <- blast_to_table(params$blast_megablast_file)
   blast_uniq_megablast_table <- uniq_ref_species(blast_megablast_table)
-}
-else{
+} else{
   blast_uniq_megablast_table <- data.frame()
 }
 if(file.exists(params$blast_blastx_file)){
   blast_blastx_table <- blast_to_table(params$blast_blastx_file)
   blast_uniq_blastx_table <- uniq_ref_species(blast_blastx_table)
-}
-else{
+} else{
   blast_uniq_blastx_table <- data.frame()
+}
+
+# zoonotic rank data
+if(file.exists(params$zoonotic_rank_predictions_file)){
+  zoonotic_rank_predictions <- zoonotic_rank_to_table(params$zoonotic_rank_predictions_file)
+} else {
+  zoonotic_rank_predictions <- data.frame()
 }
 
 # subset blast data and save as widgets
@@ -120,8 +146,7 @@ if(file.exists(params$blast_blastn_file)){
                                 class = 'display')
   blastn_html_link <- paste("analysis/", prefix, ".full_blastn_table.html", sep = "")
   saveWidget(blastn_datatable, paste(getwd(),"/",prefix,"/",blastn_html_link, sep=""))
-}
-else{
+} else{
   blastn_html_link <- ""
 }
 if(file.exists(params$blast_megablast_file)){
@@ -140,8 +165,7 @@ if(file.exists(params$blast_megablast_file)){
                                   class = 'display')
   megablast_html_link <- paste("analysis/", prefix, ".full_megablast_table.html", sep = "")
   saveWidget(megablast_datatable, paste(getwd(),"/",prefix,"/", megablast_html_link, sep=""))
-}
-else{
+} else{
   megablast_html_link <- ""
 }
 if(file.exists(params$blast_blastx_file)){
@@ -160,8 +184,7 @@ if(file.exists(params$blast_blastx_file)){
                                 class = 'display')
   blastx_html_link <- paste("analysis/", prefix, ".full_blastx_table.html", sep = "")
   saveWidget(blastx_datatable, paste(getwd(),"/",prefix,"/", blastx_html_link, sep=""))
-}
-else{
+} else{
   blastx_html_link <- ""
 }
 ```
@@ -182,16 +205,24 @@ knitr::kable(ref_map_summary_table, caption = 'Column follows bamcov format.')
 
 ### Read classification
 ```{r, fig.align='center', fig.cap='Order-level heatmap'}
-knitr::include_graphics(classification_order_heatmap_file)
+if(file.exists(classification_order_heatmap_file)){
+  include_graphics(classification_order_heatmap_file)
+}
 ```
 ```{r, fig.align='center', fig.cap='Family-level heatmap'}
-knitr::include_graphics(classification_family_heatmap_file)
+if(file.exists(classification_family_heatmap_file)){
+  include_graphics(classification_family_heatmap_file)
+}
 ```
 ```{r, fig.align='center', fig.cap='Genus-level heatmap'}
-knitr::include_graphics(classification_genus_heatmap_file)
+if(file.exists(classification_genus_heatmap_file)){
+  include_graphics(classification_genus_heatmap_file)
+}
 ```
 ```{r, fig.align='center', fig.cap='Species-level heatmap'}
-knitr::include_graphics(classification_species_heatmap_file)
+if(file.exists(classification_species_heatmap_file)){
+  include_graphics(classification_species_heatmap_file)
+}
 ```
 
 The piechart generated from Kraken result is linked [here](`r classification_kraken_link`).
@@ -199,7 +230,7 @@ The piechart generated from Kraken result is linked [here](`r classification_kra
 The piechart generated from Kaiju result is linked [here](`r classification_kaiju_link`).
 
 ### Assembly
-```{r}
+```{r message=FALSE, warning=FALSE}
 ggplot(contigs_len, aes(x=length))+
   geom_histogram(color="darkblue", fill="lightblue") + 
   geom_vline(aes(xintercept=mean(length)),
@@ -229,3 +260,6 @@ knitr::kable(blast_uniq_blastx_table)
 More functional table is linked [here](`r blastx_html_link`).
 
 #### Zoonotic Rank
+```{r}
+knitr::kable(zoonotic_rank_predictions)
+```
