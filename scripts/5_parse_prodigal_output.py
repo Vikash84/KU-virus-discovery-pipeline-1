@@ -50,4 +50,4 @@ with open(args.input) as f:
             df = df.append(entry.retrieve_as_pd_entry(), ignore_index=True)
 
 df = df.rename(columns={'name':'Name','id':'SequenceID','start':'CodingStart','end':'CodingStop'})
-df.to_csv(args.output, index=False, header=True, cols=['Name','SequenceID','CodingStart','CodingStop'])
+df.to_csv(args.output, index=False, header=True, columns=['Name','SequenceID','CodingStart','CodingStop'])
