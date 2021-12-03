@@ -13,7 +13,6 @@ workflow polish {
 
 process racon {
     conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
-    publishDir "${params.outdir}/assembly", mode: 'copy'
     input:
         path contigs
         path fastq
