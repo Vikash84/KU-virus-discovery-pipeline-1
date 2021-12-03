@@ -21,10 +21,12 @@ knitr::opts_chunk$set(echo=FALSE)
 ```
 
 ```{r message=FALSE, warning=FALSE}
-library("dplyr")
-library("data.table")
-library("DT")
-library("ggplot2")
+library(dplyr)
+library(data.table)
+library(DT)
+library(ggplot2)
+library(rsvg)
+library(kableExtra)
 ```
 
 ```{r}
@@ -68,11 +70,12 @@ zoonotic_rank_to_table <- function(text_file) {
   ret <- read.csv(text_file)
   ret <- ret[c("Name", "priority_category")]
   colnames(ret) <- c("NAME", "ZOONOTIC POTENTIAL")
+  level.order <- c("Very high", "High", "Medium", "Low")
+  ret$"ZOONOTIC POTENTIAL" <- factor(ret$"ZOONOTIC POTENTIAL", levels= level.order)
+  ret <- ret[ret$"ZOONOTIC POTENTIAL" %in% c("Very high", "High"),]
+  ret <- ret[order(ret$"ZOONOTIC POTENTIAL", nchar(ret$NAME), ret$NAME),]
+  rownames(ret) <- NULL
   return(ret)
-}
-
-include_graphics = function(...) {
-  knitr::include_graphics(..., error = FALSE)
 }
 
 # --- Input Data ---
@@ -93,6 +96,12 @@ classification_order_heatmap_file <- paste(params$classification_base_dir_path, 
 classification_family_heatmap_file <- paste(params$classification_base_dir_path, "/", prefix, "_family.svg", sep = "")
 classification_genus_heatmap_file <- paste(params$classification_base_dir_path, "/", prefix, "_genus.svg", sep = "")
 classification_species_heatmap_file <- paste(params$classification_base_dir_path, "/", prefix, "_species.svg", sep = "")
+
+classification_order_heatmap_png <- paste(params$classification_base_dir_path, "/", prefix, "_order.png", sep = "")
+classification_family_heatmap_png <- paste(params$classification_base_dir_path, "/", prefix, "_family.png", sep = "")
+classification_genus_heatmap_png <- paste(params$classification_base_dir_path, "/", prefix, "_genus.png", sep = "")
+classification_species_heatmap_png <- paste(params$classification_base_dir_path, "/", prefix, "_species.png", sep = "")
+
 
 # contigs file
 if(file.exists(params$contigs_len_file)){
@@ -200,28 +209,34 @@ QC result of the given input fastq file. The independent report produced with Na
 
 ### Reference Mapping
 ```{r}
-knitr::kable(ref_map_summary_table, caption = 'Column follows bamcov format.')
+ref_map_summary_table %>%
+  kbl(align = "ccc") %>%
+  kable_styling()
 ```
 
 ### Read classification
 ```{r, fig.align='center', fig.cap='Order-level heatmap'}
 if(file.exists(classification_order_heatmap_file)){
-  include_graphics(classification_order_heatmap_file)
+  rsvg_png(classification_order_heatmap_file, file=classification_order_heatmap_png)
+  knitr::include_graphics(normalizePath(classification_order_heatmap_png))
 }
 ```
 ```{r, fig.align='center', fig.cap='Family-level heatmap'}
 if(file.exists(classification_family_heatmap_file)){
-  include_graphics(classification_family_heatmap_file)
+  rsvg_png(classification_family_heatmap_file, file=classification_family_heatmap_png)
+  knitr::include_graphics(normalizePath(classification_family_heatmap_png))
 }
 ```
 ```{r, fig.align='center', fig.cap='Genus-level heatmap'}
 if(file.exists(classification_genus_heatmap_file)){
-  include_graphics(classification_genus_heatmap_file)
+  rsvg_png(classification_genus_heatmap_file, file=classification_genus_heatmap_png)
+  knitr::include_graphics(normalizePath(classification_genus_heatmap_png))
 }
 ```
 ```{r, fig.align='center', fig.cap='Species-level heatmap'}
 if(file.exists(classification_species_heatmap_file)){
-  include_graphics(classification_species_heatmap_file)
+  rsvg_png(classification_species_heatmap_file, file=classification_species_heatmap_png)
+  knitr::include_graphics(normalizePath(classification_species_heatmap_png))
 }
 ```
 
@@ -243,23 +258,32 @@ The histogram shows the length distribution of the assembled contigs. Dashed lin
 #### BLAST
 ##### BLASTn
 ```{r}
-knitr::kable(blast_uniq_blastn_table)
+blast_uniq_blastn_table %>%
+  kbl(align = "ccc") %>%
+  kable_styling()
 ```
 More functional table is linked [here](`r blastn_html_link`).
 
 ##### megaBLAST
 ```{r}
-knitr::kable(blast_uniq_megablast_table)
+blast_uniq_megablast_table %>%
+  kbl(align = "ccc") %>%
+  kable_styling()
 ```
 More functional table is linked [here](`r megablast_html_link`).
 
 ##### Diamond(BLASTx)
 ```{r}
-knitr::kable(blast_uniq_blastx_table)
+blast_uniq_blastx_table %>%
+  kbl(align = "ccc") %>%
+  kable_styling()
 ```
 More functional table is linked [here](`r blastx_html_link`).
 
 #### Zoonotic Rank
 ```{r}
-knitr::kable(zoonotic_rank_predictions)
+zoonotic_rank_predictions %>%
+  kbl(align = "ccc") %>%
+  kable_paper() %>%
+  scroll_box(width = "100%", height = "500px")
 ```
