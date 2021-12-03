@@ -287,3 +287,9 @@ zoonotic_rank_predictions %>%
   kable_paper() %>%
   scroll_box(width = "100%", height = "500px")
 ```
+Sequences only with labels "Very high" and "High" are shown. All the data is linked [here](`r normalizePath(params$zoonotic_rank_predictions_file)`).
+
+## Contact information
+[The pipeline](https://github.com/KijinKims/Long-read-Seq-Virome-Pipeline) and this report generating module were developed by me, Kijin Kim.
+
+If you encounter bugs or difficulties, please send me feedback by [e-mail](mailto:skkujin@gmail.com).
