@@ -22,26 +22,26 @@ workflow reference_mapping_nanopore {
 }
 
 process mapping_illumina {
-    conda '/home/molecularvirology/miniconda2/envs/vdp_srs'
-    errorStrategy 'ignore'
+    conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
     stageInMode "link"
 
     input:
         tuple path(pe1), path(pe2)
     output:
-        file '*bam'
+        file '*bam' optional true
     """
     cat ${params.reference_list_path} | while read ref
     do
     base=\$(basename \${ref})
     simple=\${base%%.*}
-    bowtie2 -1 $pe1 -2 $pe2 -x \${ref} | samtools view -Sb | samtools sort - | samtools view -b -F 4 -o "${params.prefix}_\${simple}.bam"
+    minimap2 -ax \${ref} $pe1 $pe2 | samtools view -Sb | samtools sort - | samtools view -b -F 4 -o "${params.prefix}_\${simple}.bam"
     done
     """
 }
 
 process mapping_nanopore {
     conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
+    stageInMode "link"
 
     input:
         path(fastq)

@@ -27,7 +27,6 @@ workflow assemble_nanopore {
 
 process filterContigs_illumina {
     conda '/home/molecularvirology/miniconda2/envs/vdp_lrs'
-    publishDir "${params.outdir}/assembly", mode: 'copy'
 
     input:
         path contigs
@@ -75,6 +74,7 @@ process contigLen {
 process spades{
     conda '/home/molecularvirology/miniconda2/envs/vdp_srs'
     errorStrategy { 'ignore' }
+    publishDir "${params.outdir}/assembly", mode: 'copy'
     input:
         tuple path(pe1), path(pe2)
     output:
