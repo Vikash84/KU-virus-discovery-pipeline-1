@@ -34,7 +34,7 @@ process mapping_illumina {
     do
     base=\$(basename \${ref})
     simple=\${base%%.*}
-    minimap2 -ax \${ref} $pe1 $pe2 | samtools view -Sb | samtools sort - | samtools view -b -F 4 -o "${params.prefix}_\${simple}.bam"
+    minimap2 -ax sr \${ref} $pe1 $pe2 | samtools view -Sb | samtools sort - | samtools view -b -F 4 -o "${params.prefix}_\${simple}.bam"
     done
     """
 }
