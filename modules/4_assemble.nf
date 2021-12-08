@@ -109,12 +109,12 @@ process canu {
     input:
         path fastq
     output:
-        path("${params.prefix}.canu.contigs.fa") optional true
+        path("${params.prefix}/${params.prefix}.contigs.fasta") optional true
     """
     echo "De novo assembly with Canu"
     canu -p $params.prefix -d $params.prefix -nanopore $fastq \
-    genomeSize=5m minReadLength=300 minOverlapLength=50 maxThreads=12 minInpuCoverage=0 StopOnCoverage=0 \
-    corOutCoverage=10000 corMhapSensitivity=high corMinCoverage=0 \
-    redMemory=32 oeaMemory=32 batMemory=200
+    genomeSize=5m minReadLength=300 minOverlapLength=50 maxThreads=12 \
+    minInputCoverage=0 stopOnLowCoverage=0 corOutCoverage=10000 corMhapSensitivity=high corMinCoverage=0 \
+    redMemory=32 oeaMemory=32 batMemory=200 useGrid=false
     """
 }

@@ -98,7 +98,7 @@ process prodigalAndParse {
     output:
         path "zoonotic_rank_metadata.csv"
     """
-    prodigal -i $contigs -f sco -o prodigal_output.sco
+    prodigal -i $contigs -f sco -o prodigal_output.sco -p meta
     python ${params.nextflow_script_path}/scripts/5_parse_prodigal_output.py --input prodigal_output.sco --output zoonotic_rank_metadata.csv
     """
 }

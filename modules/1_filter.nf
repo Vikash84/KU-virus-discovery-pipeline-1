@@ -22,6 +22,7 @@ workflow filter_nanopore {
         filtered
     main:
         filtered = nanofilt(fastq)
+
         if ( params.host )
             filtered = hostfilter_nanopore(filtered)
 }

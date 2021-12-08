@@ -41,13 +41,16 @@ with open(args.input) as f:
     for line in f.readlines():
         if line.startswith('# Sequence Data:'):
             seq_name = line.split('seqhdr=')[1].strip().strip('"')
-        if line.startswith('>'):
+        elif line.startswith('# Model Data:'):
+            transl_table = line.split('transl_table=')[1].split(';')[0]
+        elif line.startswith('>'):
             cds_list = line.strip().split('_')
             cord_start = cds_list[1]
             cord_end = cds_list[2]
             direction = cds_list[3]
             entry = Entry(seq_name, cord_start, cord_end, direction)
-            df = df.append(entry.retrieve_as_pd_entry(), ignore_index=True)
+            if transl_table == '11':
+                df = df.append(entry.retrieve_as_pd_entry(), ignore_index=True)
 
 df = df.rename(columns={'name':'Name','id':'SequenceID','start':'CodingStart','end':'CodingStop'})
 df.to_csv(args.output, index=False, header=True, columns=['Name','SequenceID','CodingStart','CodingStop'])
