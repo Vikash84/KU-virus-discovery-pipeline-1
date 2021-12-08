@@ -62,7 +62,7 @@ process nanoplot {
     output:
         path "${params.prefix}_*"
     """
-    NanoPlot --fasta $fastq -p ${params.prefix}_ -o ${params.prefix}
+    NanoPlot --fastq $fastq -p ${params.prefix}_ -o ${params.prefix}
     mv ${params.prefix}/* .
     """
 }
