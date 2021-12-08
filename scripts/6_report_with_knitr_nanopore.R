@@ -61,7 +61,7 @@ if(is.na(args$mapping_summary)){
 # classification heatmap image files
 
 if(is.na(args$classification_result_folder)){
-  classification_base_dir_path <- paste(prefix, "/classification", sep="")
+  classification_base_dir_path <- "classification"
 } else{
   classification_base_dir_path <- args$classification_result_folder
 }

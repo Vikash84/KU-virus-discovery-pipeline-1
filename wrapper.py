@@ -287,6 +287,6 @@ for i in range(len(cmd_list)) :
     cmd += " -resume " if resume else ""
     subprocess.run(cmd, shell=True, check=True)
 
-#    prefix = arguments_list[i].prefix
-#    report_cmd = "Rscript " + scripts_path + "6_report_with_knitr_" + platform + ".R --prefix " + prefix + " --markdown " + scripts_path + "6_report_template_" + prefix + ".Rmd"
-#    subprocess.run(report_cmd, shell=True, check=True)
+    prefix = arguments_list[i].prefix
+    report_cmd = "Rscript " + scripts_path + "6_report_with_knitr_" + platform + ".R --prefix " + prefix + " --markdown " + scripts_path + "6_report_template_" + platform + ".Rmd"
+    subprocess.run(report_cmd, shell=True, check=True)

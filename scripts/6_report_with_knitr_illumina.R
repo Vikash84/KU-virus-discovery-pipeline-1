@@ -14,6 +14,8 @@ p <- arg_parser("Illumina analysis report generating program")
 
 p <- add_argument(p, "--prefix", help="Sample prefix")
 
+p <- add_argument(p, "--markdown", help="Rmarkdown template path")
+
 p <- add_argument(p, "--multiqc_html", help="Multiqc html file path")
 
 p <- add_argument(p, "--mapping_summary", help="Reference mapping summary file path")
@@ -24,9 +26,7 @@ p <- add_argument(p, "--classification_kraken_html", help="Kraken result html fi
 
 p <- add_argument(p, "--classification_kaiju_html", help="Kaiju result html file path")
 
-p <- add_argument(p, "--assembly_summary", help="Contigs summary file path")
-
-p <- add_argument(p, "--assembly_length_histogram", help="Contigs length histogram file path")
+p <- add_argument(p, "--contigs_len", help="Contigs length file path")
 
 p <- add_argument(p, "--blastn_table", help="Blastn result file path")
 
