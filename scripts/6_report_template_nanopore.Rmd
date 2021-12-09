@@ -92,12 +92,10 @@ if(file.exists(params$ref_map_summary_file)){
 }
 
 # classification heatmap image files
-classification_order_heatmap_file <- paste(params$classification_base_dir_path, "/", prefix, "_order.svg", sep = "")
 classification_family_heatmap_file <- paste(params$classification_base_dir_path, "/", prefix, "_family.svg", sep = "")
 classification_genus_heatmap_file <- paste(params$classification_base_dir_path, "/", prefix, "_genus.svg", sep = "")
 classification_species_heatmap_file <- paste(params$classification_base_dir_path, "/", prefix, "_species.svg", sep = "")
 
-classification_order_heatmap_png <- paste(params$classification_base_dir_path, "/", prefix, "_order.png", sep = "")
 classification_family_heatmap_png <- paste(params$classification_base_dir_path, "/", prefix, "_family.png", sep = "")
 classification_genus_heatmap_png <- paste(params$classification_base_dir_path, "/", prefix, "_genus.png", sep = "")
 classification_species_heatmap_png <- paste(params$classification_base_dir_path, "/", prefix, "_species.png", sep = "")
@@ -215,12 +213,6 @@ ref_map_summary_table %>%
 ```
 
 ### Read classification
-```{r, fig.align='center', fig.cap='Order-level heatmap'}
-if(file.exists(classification_order_heatmap_file)){
-  rsvg_png(classification_order_heatmap_file, file=classification_order_heatmap_png)
-  knitr::include_graphics(normalizePath(classification_order_heatmap_png))
-}
-```
 ```{r, fig.align='center', fig.cap='Family-level heatmap'}
 if(file.exists(classification_family_heatmap_file)){
   rsvg_png(classification_family_heatmap_file, file=classification_family_heatmap_png)
