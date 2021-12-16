@@ -12,10 +12,12 @@ workflow analyze_contigs {
         parseBlastn(blastn_result)
         parseMegaBlast(megablast_result)
         parseDiamondBlastx(diamond_result)
+
+        prodigal_result = prodigalAndParse(contigs)
+        zoonoticRank(contigs, prodigal_result)
 }
 
 process blastn {
-    
     input:
         path contigs
     output:
@@ -48,9 +50,9 @@ process parseBlastn {
     output:
         path "${params.prefix}.blastn.txt"
     """
-    cat ${params.nextflow_script_path}/headers/blast_header $result > ${result.baseName}.headered.tmp
-    python ${params.nextflow_script_path}/scripts/5_blast_result_filter.py --input ${result.baseName}.headered.tmp --output ${result.baseName}.filtered.tmp --aln_len 100 --aln_contig_len_prop 0.5
-    Rscript ${params.nextflow_script_path}/scripts/5_match_taxonomy_to_blast_result.R ${result.baseName}.filtered.tmp ${params.prefix}.blastn.txt ${params.taxonomizr_db_path}
+    cat /root/headers/blast_header $result > ${result.baseName}.headered.tmp
+    python /root/scripts/5_blast_result_filter.py --input ${result.baseName}.headered.tmp --output ${result.baseName}.filtered.tmp --aln_len 100 --aln_contig_len_prop 0.5
+    Rscript /root/scripts/5_match_taxonomy_to_blast_result.R ${result.baseName}.filtered.tmp ${params.prefix}.blastn.txt ${params.taxonomizr_db_path}
     """
 }
 
@@ -63,9 +65,9 @@ process parseMegaBlast {
     output:
         path "${params.prefix}.megablast.txt"
     """
-    cat ${params.nextflow_script_path}/headers/blast_header $result > ${result.baseName}.headered.tmp
-    python ${params.nextflow_script_path}/scripts/5_blast_result_filter.py --input ${result.baseName}.headered.tmp --output ${result.baseName}.filtered.tmp --aln_len 100 --aln_contig_len_prop 0.5
-    Rscript ${params.nextflow_script_path}/scripts/5_match_taxonomy_to_blast_result.R ${result.baseName}.filtered.tmp ${params.prefix}.megablast.txt ${params.taxonomizr_db_path}
+    cat /root/headers/blast_header $result > ${result.baseName}.headered.tmp
+    python /root/scripts/5_blast_result_filter.py --input ${result.baseName}.headered.tmp --output ${result.baseName}.filtered.tmp --aln_len 100 --aln_contig_len_prop 0.5
+    Rscript /root/scripts/5_match_taxonomy_to_blast_result.R ${result.baseName}.filtered.tmp ${params.prefix}.megablast.txt ${params.taxonomizr_db_path}
     """
 }
 
@@ -78,8 +80,32 @@ process parseDiamondBlastx {
     output:
         path "${params.prefix}.blastx.txt" optional true
     """
-    cat ${params.nextflow_script_path}/headers/blast_header $result > ${result.baseName}.headered.tmp
-    python ${params.nextflow_script_path}/scripts/5_blast_result_filter.py --input ${result.baseName}.headered.tmp --output ${result.baseName}.filtered.tmp --aln_len 33 --aln_contig_len_prop 0.17
-    Rscript ${params.nextflow_script_path}/scripts/5_match_taxonomy_to_blast_result.R ${result.baseName}.filtered.tmp ${params.prefix}.blastx.txt ${params.taxonomizr_db_path}
+    cat /root/headers/blast_header $result > ${result.baseName}.headered.tmp
+    python /root/scripts/5_blast_result_filter.py --input ${result.baseName}.headered.tmp --output ${result.baseName}.filtered.tmp --aln_len 33 --aln_contig_len_prop 0.17
+    Rscript /root/scripts/5_match_taxonomy_to_blast_result.R ${result.baseName}.filtered.tmp ${params.prefix}.blastx.txt ${params.taxonomizr_db_path}
+    """
+}
+
+process prodigalAndParse {
+    input:
+        path contigs
+    output:
+        path "zoonotic_rank_metadata.csv"
+    """
+    prodigal -i $contigs -f sco -o prodigal_output.sco
+    python /root/scripts/5_parse_prodigal_output.py --input prodigal_output.sco --output zoonotic_rank_metadata.csv
+    """
+}
+
+process zoonoticRank {
+    publishDir "${params.outdir}/analysis", mode: 'copy'
+    
+    input:
+        path contigs
+        path metadata
+    output:
+        path "zoonotic_rank/*"
+    """
+    Rscript /root/scripts/6_PredictNovel.R fasta $contigs $metadata zoonotic_rank/${params.prefix} --script_path ${params.zoonotic_rank_dir}
     """
 }
