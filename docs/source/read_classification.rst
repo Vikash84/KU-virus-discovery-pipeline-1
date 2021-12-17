@@ -1,0 +1,10 @@
+*******************
+Read classification
+*******************
+
+Illumina
+########
+
+
+Nanopore
+########

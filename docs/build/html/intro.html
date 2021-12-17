@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Introduction &mdash; KU-virus-discovery-pipeline 2.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+    <link rel="prev" title="Welcome to KU-virus-discovery-pipeline’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> KU-virus-discovery-pipeline
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Start</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start-for-researchers-having-pre-installed-pipeline">Quick start for researchers having pre-installed pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pipeline-structure">Pipeline Structure</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#reference-mapping">Reference mapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#read-classification">Read classification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#de-novo-assembly">De novo assembly</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#warning">Warning</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Pipeline</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quality_control.html">1. Quality Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="filter.html">2. Read filtering</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference_mapping.html">3. Reference mapping</a></li>
+<li class="toctree-l1"><a class="reference internal" href="read_classification.html">4. Read classification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="de_novo_assembly.html">5. De novo assembly</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analyze_contigs.html">6. Contig analsysis</a></li>
+<li class="toctree-l1"><a class="reference internal" href="report_generate.html">7. Reporting</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">KU-virus-discovery-pipeline</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Introduction</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/intro.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h1>
+<p><a class="reference external" href="https://github.com/KijinKims/KU-virus-discovery-pipeline">KU virus discovery pipeline</a> aims to find out virus-originated sequences from NGS throughput by performing several analyses. Currently, either Illumina or Nanopore input is supported.</p>
+<p>Initially, it was developed for the internal use of the Molecular Virology Lab in Korea University College of Medicine. It has contributed to the discovery of a new virus in the lab.
+Since it follows the standard virus identification pipeline paradigm, there is no novelty in the theoretical aspect. But if you are looking for a ready-made virus discovery pipeline, you can freely clone and modify the code for your needs.</p>
+<section id="quick-start-for-researchers-having-pre-installed-pipeline">
+<h2>Quick start for researchers having pre-installed pipeline<a class="headerlink" href="#quick-start-for-researchers-having-pre-installed-pipeline" title="Permalink to this headline"></a></h2>
+<p>If I, Kijin Kim, personally installed the pipeline in your(or your institution’s) computer, please follow the below instruction.</p>
+<p>First activate the pipeline conda environment by</p>
+<p><cite>conda activate ku_pipeline_env</cite></p>
+<p>Then, you can simply use the pipeline in two ways.</p>
+<p><cite>kuwrapper [platform] --fastq [fastq path] (--fastq2 [fastq2 path]) --prefix [prefix] --host [host]</cite></p>
+<p>or</p>
+<p><cite>kuwrapper [platform] -f [input list as file]</cite></p>
+<p>Let’s call the above mode as single file mode and the bottom one as multiple files mode.
+Note that before listing options, you need to write the <cite>platform</cite> from which your data came. For every run, you need to specify at least one(for nanopore sequencing) or two(for illumina paired sequencing) <cite>fastq</cite> files, one <cite>prefix</cite> and one <cite>host</cite> parameters. <cite>prefix</cite> denotes the name to be given for the run. <cite>host</cite> indicates the academic name of host that is your data’s biological origin. So far, there are limited numbers of supported hosts. You can look them up by typing <cite>kuwrapper host</cite>. These paramters are all you need to run in single file mode.</p>
+<p>From my experience, it is really annoying to run many input files one by one by spawning new terminal for each input. That’s why I created the multiple files mode. This mode only necessitates one paratmer <cite>input list as file</cite>. But this file needs to be in specific format. As I said above, every run needs at least three parameters <cite>fastq</cite>, <cite>prefix</cite> and <cite>host</cite>. The input file shoud have each paramter name as column header in a tab-delimited way. And each run should be appended as one row for each with corresponding values filled. I suppose you feel confused, so I prepared the example.</p>
+<table class="colwidths-given docutils align-default" id="id1">
+<caption><span class="caption-text">example_input_file.txt</span><a class="headerlink" href="#id1" title="Permalink to this table"></a></caption>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>fastq</p></th>
+<th class="head"><p>prefix</p></th>
+<th class="head"><p>host</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>human21-01.fastq</p></td>
+<td><p>human_1</p></td>
+<td><p>homo sapiens</p></td>
+</tr>
+<tr class="row-odd"><td><p>rat21-01.fastq</p></td>
+<td><p>rat_1</p></td>
+<td><p>rattus norvegicus</p></td>
+</tr>
+</tbody>
+</table>
+<p>NOTE! every value should be split by TAB!</p>
+<p>If your inputs are in order, pipeline will work as expected. (if I told you the pipeline is ready to be used…)</p>
+</section>
+<section id="pipeline-structure">
+<h2>Pipeline Structure<a class="headerlink" href="#pipeline-structure" title="Permalink to this headline"></a></h2>
+<p>If you are not familiar with NGS-based virus identification/discovery, I recommend you to read <a class="reference external" href="https://www.mdpi.com/1072574">this paper</a>.</p>
+<p>As a preliminary step, sequencing reads are filtered by read length and quality. The remaining reads are aligned to the host genome, and aligned reads are excluded from the following analysis.</p>
+<p>The current version does three types of analysis for input data.</p>
+<section id="reference-mapping">
+<h3>Reference mapping<a class="headerlink" href="#reference-mapping" title="Permalink to this headline"></a></h3>
+<p>If you already know the kind of virus you want to study and have its genome sequence, you can simply map the sequenced reads onto its genome. If the virus truly exists in the sample, the genome will be covered at most regions in high depth.</p>
+</section>
+<section id="read-classification">
+<h3>Read classification<a class="headerlink" href="#read-classification" title="Permalink to this headline"></a></h3>
+<p>Reads can be classified as a taxon by comparing their subsequence (or k-mer) to a database of subsequences of known genomes. The advantage of this analysis is we can guess the abundance of taxa by considering the number of reads classified to them, which can be visualized as a heat map, pie chart, etc.</p>
+</section>
+<section id="de-novo-assembly">
+<h3>De novo assembly<a class="headerlink" href="#de-novo-assembly" title="Permalink to this headline"></a></h3>
+<p>Viral genomes are fragmented during the first step of NGS. If we can recover the whole or part of the genome, it would be the best way to identify the virus genome. It is practically the only way to discover a new virus in NGS.
+By concatenating the reads that overlap, we can assemble the reads into long sequences called contigs. This step is called De novo assembly.</p>
+<p>For the assembled contigs, various analyses can be carried out. Currently, this pipeline only does a similarity-based search on contigs using BLAST and Diamond. More analysis modules will be added in the future. (e.g., HMM search)</p>
+</section>
+</section>
+<section id="warning">
+<h2>Warning<a class="headerlink" href="#warning" title="Permalink to this headline"></a></h2>
+<ul class="simple">
+<li><p>The pipeline is only validated for a dataset generated by a specific protocol, which is unavailable online. You need to optimize the pipeline with different parameter sets for your dataset.</p></li>
+<li><p>I don’t know if this pipeline efficiently works in a desktop environment. I only ran it on a workstation.</p></li>
+<li><p>This pipeline is not the implementation of a publication. So, there’s no warranty.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to KU-virus-discovery-pipeline’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Kijin Kim.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

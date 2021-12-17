@@ -1,4 +1,4 @@
-name: ku_pipeline_docker_env
+name: ku_pipeline_env
 dependencies:
   - nextflow
   - pandas
