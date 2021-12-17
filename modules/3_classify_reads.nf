@@ -8,6 +8,9 @@ workflow classify_reads_illumina {
         kreport2krona(kraken_result)
         edge_form = kreport2EDGEform(kraken_result)
         EDGEform2heatmap(edge_form)
+
+        kaiju_result = kaiju_illumina(fastqs)
+        kaiju2krona(kaiju_result)
 }
 
 workflow classify_reads_nanopore {
@@ -23,8 +26,48 @@ workflow classify_reads_nanopore {
         kaiju2krona(kaiju_result)
 }
 
-process kreport2EDGEform {
+process kraken2_illumina {
+    input:
+        tuple path(pe1), path(pe2)
+    output:
+        path "${params.prefix}.kraken_report.csv"
+    """
+    echo "Classify reads into taxonomy with Kraken2"
+    kraken2 --db $params.kraken_db_path \
+        --report ${params.prefix}.kraken_report.csv \
+        --paired --threads 12 --confidence 0.1\
+        $pe1 $pe2
+    """
+}
 
+process kraken2_nanopore {
+    input:
+        path fastq
+    output:
+        path "${params.prefix}.kraken_report.csv"
+    """
+    echo "Classify reads into taxonomy with Kraken2"
+    kraken2 --db $params.kraken_db_path \
+        --report ${params.prefix}.kraken_report.csv \
+        --threads 12 --confidence 0.1\
+        $fastq
+    """
+}
+
+process kreport2krona {
+    publishDir "${params.outdir}/classification", mode: 'copy'
+    input:
+        path kraken_report
+    output:
+        path "${params.prefix}.kraken.html"
+    """
+    echo "Convert Kraken report to Krona format"
+    kreport2krona.py -r $kraken_report -o ${params.prefix}.krona
+    ktImportText ${params.prefix}.krona -o ${params.prefix}.kraken.html
+    """
+}
+
+process kreport2EDGEform {
     input:
         path kraken_report
     output:
@@ -50,49 +93,21 @@ process EDGEform2heatmap {
     """
 }
 
-process kraken2_illumina {
+process kaiju_illumina {
+    publishDir "${params.outdir}/classification", mode: 'copy'
     input:
         tuple path(pe1), path(pe2)
     output:
-        path "${params.prefix}.kraken_report.csv"
+        path "${params.prefix}.kaiju.out.krona"
     """
-    echo "Classify reads into taxonomy with Kraken2"
-    echo "sample name: $params.prefix"
-    echo "kraken db path: $params.kraken_db_path"
-    kraken2 --db $params.kraken_db_path \
-        --report ${params.prefix}.kraken_report.csv \
-        --paired --threads 12 --confidence 0.1\
-        $pe1 $pe2
-    """
-}
-
-process kraken2_nanopore {
-    input:
-        path fastq
-    output:
-        path "${params.prefix}.kraken_report.csv"
-    """
-    echo "Classify reads into taxonomy with Kraken2"
-    echo "sample name: $params.prefix"
-    echo "kraken db path: $params.kraken_db_path"
-    kraken2 --db $params.kraken_db_path \
-        --report ${params.prefix}.kraken_report.csv \
-        --threads 12 --confidence 0.1\
-        $fastq
-    """
-}
-
-process kreport2krona {
-    publishDir "${params.outdir}/classification", mode: 'copy'
-    input:
-        path kraken_report
-    output:
-        path "${params.prefix}.kraken.html"
-    """
-    echo "Convert Kraken report to Krona format"
-    echo "sample name: $params.prefix"
-    kreport2krona.py -r $kraken_report -o ${params.prefix}.krona
-    ktImportText ${params.prefix}.krona -o ${params.prefix}.kraken.html
+    echo "Classify reads into taxonomy with Kaiju"
+    kaiju -f $params.kaiju_db_path/kaiju_db_nr.fmi \
+        -t $params.kaiju_db_path/nodes.dmp \
+        -i $pe1 -j $pe2 \
+        -o ${params.prefix}.kaiju.out \
+        -a greedy -E 0.05 -z 24 -v
+    kaiju2table -t ${params.kaiju_db_path}/nodes.dmp -n ${params.kaiju_db_path}/names.dmp -r species -e -o ${params.prefix}.kaiju_summary.tsv ${params.prefix}.kaiju.out
+    kaiju2krona -t ${params.kaiju_db_path}/nodes.dmp -n ${params.kaiju_db_path}/names.dmp -i ${params.prefix}.kaiju.out -o ${params.prefix}.kaiju.out.krona
     """
 }
 
@@ -104,8 +119,6 @@ process kaiju_nanopore {
         path "${params.prefix}.kaiju.out.krona"
     """
     echo "Classify reads into taxonomy with Kaiju"
-    echo "sample name: $params.prefix"
-    echo "kaiju db path: $params.kaiju_db_path"
     kaiju -f $params.kaiju_db_path/kaiju_db_nr.fmi \
         -t $params.kaiju_db_path/nodes.dmp \
         -i $fastq \
@@ -124,7 +137,6 @@ process kaiju2krona {
         path "${params.prefix}.kaiju.html"
     """
     echo "Visualize Kaiju result with Krona"
-    echo "sample name: $params.prefix"
     ktImportText $kaiju_krona -o ${params.prefix}.kaiju.html
     """
 }

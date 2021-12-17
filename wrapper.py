@@ -10,23 +10,22 @@ import pandas as pd
 ####################################################################
 ###########             path should be given             ###########
 ####################################################################
-nextflow_path="" # nextflow binary path
-host_reference_dir_path = "" # directory containing host reference sequences
+host_reference_dir_path =   ""   # directory containing host reference sequences
 ####################################################################
 
 nextflow_script_path=os.path.dirname(os.path.realpath(__file__))+"/"
 scripts_path=nextflow_script_path+"scripts"+"/"
 
 host_reference_dict = { 
-#              'rhinolophus ferrumequinum' : host_reference_dir_path + "/GCF_004115265.1_mRhiFer1_v1.p_genomic.fna.gz",  #bat
-#              'pygoscelis antarctica' : host_reference_dir_path + "/GCA_010078415.1_BGI_Pant.V1_genomic.fna.gz",        #penguin
-#              'haemaphysalis longicornis' : host_reference_dir_path + "/GCA_010078415.1_BGI_Pant.V1_genomic.fna.gz",    #tick
-#              'homo sapiens' : host_reference_dir_path + "/GCF_000001405.39_GRCh38.p13_genomic.fna.gz",                 #human
-#              'apodemus agrarius' : host_reference_dir_path + "/NC_016428.1_Apodemus_agrarius_mitochondrion.fasta",     
-#              'apodemus peninsulae' : host_reference_dir_path + "/NC_016060.1_Apodemus_peninsulae_mitochondrion.fasta",
-#              'apodemus chejuensis' : host_reference_dir_path + "/NC_016662.1_Apodemus_chejuensis_mitochondrion.fasta",
-#              'tscherskia triton' : host_reference_dir_path + "/NC_013068.1_Tscherskia_triton_mitochondrion.fasta",
-#              'rattus norvegicus' : host_reference_dir_path + "/GCF_015227675.2_mRatBN7.2_genomic.fna.gz",
+              'rhinolophus ferrumequinum' : host_reference_dir_path + "/GCF_004115265.1_mRhiFer1_v1.p_genomic.fna.gz",  #bat
+              'pygoscelis antarctica' : host_reference_dir_path + "/GCA_010078415.1_BGI_Pant.V1_genomic.fna.gz",        #penguin
+              'haemaphysalis longicornis' : host_reference_dir_path + "/GCA_010078415.1_BGI_Pant.V1_genomic.fna.gz",    #tick
+              'homo sapiens' : host_reference_dir_path + "/GCF_000001405.39_GRCh38.p13_genomic.fna.gz",                 #human
+              'apodemus agrarius' : host_reference_dir_path + "/NC_016428.1_Apodemus_agrarius_mitochondrion.fasta",     
+              'apodemus peninsulae' : host_reference_dir_path + "/NC_016060.1_Apodemus_peninsulae_mitochondrion.fasta",
+              'apodemus chejuensis' : host_reference_dir_path + "/NC_016662.1_Apodemus_chejuensis_mitochondrion.fasta",
+              'tscherskia triton' : host_reference_dir_path + "/NC_013068.1_Tscherskia_triton_mitochondrion.fasta",
+              'rattus norvegicus' : host_reference_dir_path + "/GCF_015227675.2_mRatBN7.2_genomic.fna.gz",
                 }
 
 def is_valid_file(parser_, arg_):
@@ -70,7 +69,7 @@ class FastqError(ValueError):
 class HostNameError(ValueError):
     def __str__(self):
         return "invalid host name. Please check the argument '--host'!"
-        
+
 class Arguments:
     def __init__(self):
         self.platform               =   ""
@@ -181,7 +180,6 @@ def parse_file_input(platform_, file_input_):
 
     return arguments_list
 
-
 def valid_check(Arguments_):
 
     if not Arguments_.fastq :
@@ -202,7 +200,7 @@ def valid_check(Arguments_):
 
 def parse_arguments_to_cmd(Arguments_):
     cmd = ""
-    cmd = nextflow_path + "nextflow run " + nextflow_script_path 
+    cmd = "nextflow run " + nextflow_script_path 
     if Arguments_.platform == "illumina":
         cmd = cmd + "main_illumina.nf "
     else:
@@ -220,9 +218,10 @@ def parse_arguments_to_cmd(Arguments_):
 
     
     return cmd
+    
 
 # Take input parameters into parser
-    
+
 parser = argparse.ArgumentParser(description= 'Wrapper script for running pipeline')
 
 parser.add_argument('platform', choices=['nanopore', 'illumina', 'host'])
@@ -288,6 +287,5 @@ for i in range(len(cmd_list)) :
     subprocess.run(cmd, shell=True, check=True)
 
     prefix = arguments_list[i].prefix
-    report_cmd = "Rscript " + scripts_path + "6_report_with_nozzle_" + platform + ".R --prefix " + prefix
+    report_cmd = "Rscript " + scripts_path + "6_report_with_knitr_" + platform + ".R --prefix " + prefix + " --markdown " + scripts_path + "6_report_template_" + platform + ".Rmd"
     subprocess.run(report_cmd, shell=True, check=True)
-    

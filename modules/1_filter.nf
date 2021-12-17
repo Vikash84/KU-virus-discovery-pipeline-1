@@ -53,7 +53,6 @@ process decompress_fastq {
 }
 
 process deduplication {
-
     input:
         tuple path(pe1), path(pe2)
     output:
@@ -103,15 +102,12 @@ process hostfilter_illumina {
     """
     echo "Host filter with minimap2 and samtools"
     echo "host organism: ${params.host}"
-    bowtie2 -x ${params.host_reference_path} -1 $pe1 -2 $pe2 -S temp.sam
-    samtools view -Sb temp.sam | samtools view -b -f 12 -F 256 | samtools sort -o  "${params.prefix}.hostfiltered.bam"
-    rm temp.sam
-    bedtools bamtofastq -i "${params.prefix}.hostfiltered.bam" -fq ${params.prefix}_hostfiltered_1.fastq -fq2 ${params.prefix}_hostfiltered_2.fastq
+    minimap2 -ax sr ${params.host_reference_path} $pe1 $pe2 | samtools view -Sb - | samtools view -b -f 12 -F 256 | samtools sort -o aln.sorted.bam
+    bedtools bamtofastq -i aln.sorted.bam -fq ${params.prefix}_hostfiltered_1.fastq -fq2 ${params.prefix}_hostfiltered_2.fastq
     """
 }
 
 process hostfilter_nanopore {
-
     publishDir "${params.outdir}/filter", mode: 'copy'
     
     input:

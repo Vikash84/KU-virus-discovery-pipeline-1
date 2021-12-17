@@ -1,0 +1,11 @@
+name: ku_pipeline_docker_env
+dependencies:
+  - nextflow
+  - pandas
+  - r-argparser
+  - r-rmarkdown
+  - r-knitr
+  - r-ggplot2
+  - r-dplyr
+  - r-dt
+  - r-data.table

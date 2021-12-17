@@ -12,7 +12,6 @@ workflow polish {
 }
 
 process racon {
-    publishDir "${params.outdir}/assembly", mode: 'copy'
     input:
         path contigs
         path fastq
